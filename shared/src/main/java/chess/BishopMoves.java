@@ -43,13 +43,6 @@ public class BishopMoves {
                 }
             }
         }
-
-        System.out.println("Valid Moves:");
-        for (ChessMove move : validMoves) {
-            System.out.println("Move from " + move.getStartPosition().getRow() + ", " + move.getStartPosition().getColumn() +
-                    " to " + move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn());
-        }
-
         return validMoves;
     }
 
