@@ -6,35 +6,69 @@ import java.util.List;
 
 public class BishopMoves {
 
-    public List<ChessPosition> getValidMoves(ChessPosition position) {
+    public List<ChessMove> getValidMoves(ChessBoard board, ChessPosition position) {
+        System.out.println("Calling getValidMoves for position: " + position.getRow() + ", " + position.getColumn());
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
 
-        if (!position.isValidPosition(currentRow, currentCol)) {
+        if (!ChessPosition.isValidPosition(currentRow, currentCol)) {
             throw new IllegalArgumentException("Invalid position : <" + currentRow + "," + currentCol + ">.");
         }
 
-        List<ChessPosition> validMoves = new ArrayList<ChessPosition>();
+        List<ChessMove> validMoves = new ArrayList<>();
 
-        // Diagonal movement up and to the right
-        for (int i = 1; position.isValidPosition(currentRow + i, currentCol + i); i++) {
-            validMoves.add(new ChessPosition(currentRow + i, currentCol + i));
+        int[][] directions = {
+                {1,1},
+                {1,-1},
+                {-1,1},
+                {-1,-1}
+        };
+
+        for (int[] direction : directions) {
+            int row = currentRow;
+            int col = currentCol;
+
+            while (true){
+                row += direction[0];
+                col += direction[1];
+
+                if (!ChessPosition.isValidPosition(row, col)) {
+                    break;
+                }
+
+                ChessPosition newPosition = new ChessPosition(row, col);
+
+                if (!canMove(board, position, newPosition, validMoves)) {
+                    break;
+                }
+            }
         }
 
-        // Diagonal movement up and to the left
-        for (int i = 1; position.isValidPosition(currentRow + i, currentCol - 1); i++) {
-            validMoves.add(new ChessPosition(currentRow + i, currentCol - i));
+        System.out.println("Valid Moves:");
+        for (ChessMove move : validMoves) {
+            System.out.println("Move from " + move.getStartPosition().getRow() + ", " + move.getStartPosition().getColumn() +
+                    " to " + move.getEndPosition().getRow() + ", " + move.getEndPosition().getColumn());
         }
 
-        // Diagonal movement down and to the right
-        for (int i = 1; position.isValidPosition(currentRow - i, currentCol + i); i++) {
-            validMoves.add(new ChessPosition(currentRow - i, currentCol + i));
-        }
-
-        // Diagonal movement down and to the left
-        for (int i = 1; position.isValidPosition(currentRow - i, currentCol - i); i++) {
-            validMoves.add(new ChessPosition(currentRow - i, currentCol - i));
-        }
         return validMoves;
+    }
+
+
+    private boolean canMove(ChessBoard board, ChessPosition position, ChessPosition newPosition, List<ChessMove> validMoves) {
+
+        ChessPiece pieceAtNewPos = board.getPiece(newPosition);
+        ChessPiece currentPiece = board.getPiece(position);
+
+        if (pieceAtNewPos == null) {
+            validMoves.add(new ChessMove(position, newPosition, null));
+            return true;
+        }
+        else if (pieceAtNewPos.getTeamColor() != currentPiece.getTeamColor()) {
+            validMoves.add(new ChessMove(position, newPosition, null));
+            return false;
+        }
+        else {
+            return false;
+        }
     }
 }
