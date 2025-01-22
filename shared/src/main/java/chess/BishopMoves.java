@@ -7,7 +7,6 @@ import java.util.List;
 public class BishopMoves {
 
     public List<ChessMove> getValidMoves(ChessBoard board, ChessPosition position) {
-        System.out.println("Calling getValidMoves for position: " + position.getRow() + ", " + position.getColumn());
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
 

@@ -57,6 +57,10 @@ public class ChessPiece {
             BishopMoves bishopMoves = new BishopMoves();
             return bishopMoves.getValidMoves(board, myPosition);
         }
+        else if (getPieceType() == PieceType.PAWN) {
+            PawnMoves pawnMoves = new PawnMoves();
+            return pawnMoves.getValidMoves(board, myPosition);
+        }
         return new ArrayList<>();
     }
 
