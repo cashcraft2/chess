@@ -73,7 +73,12 @@ public class ChessPiece {
             KnightMoves knightMoves = new KnightMoves();
             return knightMoves.getValidMoves(board, myPosition);
         }
-        return new ArrayList<>();
+        else if (getPieceType() == PieceType.KING) {
+            KingMoves kingMoves = new KingMoves();
+            return kingMoves.getValidMoves(board, myPosition);
+        }
+        else{
+            return new ArrayList<>();
+        }
     }
-
 }
