@@ -61,6 +61,10 @@ public class ChessPiece {
             PawnMoves pawnMoves = new PawnMoves();
             return pawnMoves.getValidMoves(board, myPosition);
         }
+        else if (getPieceType() == PieceType.QUEEN) {
+            QueenMoves queenMoves = new QueenMoves();
+            return queenMoves.getValidMoves(board, myPosition);
+        }
         return new ArrayList<>();
     }
 

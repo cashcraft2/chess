@@ -25,6 +25,7 @@ public class PawnMoves {
         }
 
         ChessPosition moveForwardOne = new ChessPosition(currentRow + teamDirection, currentCol);
+
         if (board.getPiece(moveForwardOne) == null) {
             addMove(validMoves, position, moveForwardOne, currentRow + teamDirection);
 
@@ -35,12 +36,13 @@ public class PawnMoves {
             else {
                 startRow = 7;
             }
+
             ChessPosition moveForwardTwo = new ChessPosition(currentRow + 2 * teamDirection, currentCol);
+
             if (currentRow == startRow && board.getPiece(moveForwardTwo) == null) {
                 addMove(validMoves, position, moveForwardTwo, currentRow + 2 * teamDirection);
             }
         }
-
 
         int[][] captureDirections = {{teamDirection, 1}, {teamDirection, -1}};
         for (int[] direction : captureDirections) {
@@ -56,15 +58,25 @@ public class PawnMoves {
     }
 
     private void addMove(List<ChessMove> moves, ChessPosition startPosition, ChessPosition endPosition, int targetRow) {
-        ChessPiece.PieceType promotion;
+        ChessPiece.PieceType promotionQ = null;
+        ChessPiece.PieceType promotionK = null;
+        ChessPiece.PieceType promotionR = null;
+        ChessPiece.PieceType promotionB = null;
 
         if (targetRow == 8 || targetRow == 1) {
-            promotion = ChessPiece.PieceType.QUEEN;
+            promotionQ = ChessPiece.PieceType.QUEEN;
+            promotionK = ChessPiece.PieceType.KNIGHT;
+            promotionR = ChessPiece.PieceType.ROOK;
+            promotionB = ChessPiece.PieceType.BISHOP;
+
+            moves.add(new ChessMove(startPosition, endPosition, promotionQ));
+            moves.add(new ChessMove(startPosition, endPosition, promotionK));
+            moves.add(new ChessMove(startPosition, endPosition, promotionR));
+            moves.add(new ChessMove(startPosition, endPosition, promotionB));
         }
         else {
-            promotion = null;
+            moves.add(new ChessMove(startPosition, endPosition, null));
         }
-        moves.add(new ChessMove(startPosition, endPosition, promotion));
     }
 }
 
