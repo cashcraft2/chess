@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Objects;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -38,6 +40,73 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                squares[row][col] = null;
+            }
+        }
+        for (int col = 0; col < 8; col++) {
+            squares[1][col] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+            squares[6][col] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+        }
+
+        ChessPiece.PieceType[] majorPieces = {
+                ChessPiece.PieceType.ROOK, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.QUEEN,
+                ChessPiece.PieceType.KING, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.ROOK
+        };
+
+        for (int col = 0; col < 8; col++) {
+            squares[0][col] = new ChessPiece(ChessGame.TeamColor.WHITE, majorPieces[col]);
+            squares[7][col] = new ChessPiece(ChessGame.TeamColor.BLACK, majorPieces[col]);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++){
+                result = 31 * result + Objects.hashCode(squares[row][col]);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()){
+            return false;
+        }
+        ChessBoard other = (ChessBoard) obj;
+        for (int row = 0; row < 8; row++){
+            for (int col = 0; col < 8; col++){
+                ChessPiece thisPiece = this.squares[row][col];
+                ChessPiece otherPiece = other.squares[row][col];
+                if (!Objects.equals(thisPiece, otherPiece)){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int row = 7; row >= 0; row--) {  // Print from top to bottom (rank 8 to 1)
+            for (int col = 0; col < 8; col++) {
+                ChessPiece piece = squares[row][col];
+                if (piece == null) {
+                    sb.append(". ");
+                } else {
+                    sb.append(piece.toString()).append(" ");
+                }
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }
