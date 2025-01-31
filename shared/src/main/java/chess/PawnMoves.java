@@ -47,7 +47,7 @@ public class PawnMoves {
         int[][] captureDirections = {{teamDirection, 1}, {teamDirection, -1}};
         for (int[] direction : captureDirections) {
             ChessPosition capturePos = new ChessPosition(currentRow + direction[0], currentCol + direction[1]);
-            if (ChessPosition.isValidPosition(capturePos.getRow(), capturePos.getColumn())) {
+            if (position.isValidPosition(capturePos.getRow(), capturePos.getColumn())) {
                 ChessPiece pieceToCapture = board.getPiece(capturePos);
                 if (pieceToCapture != null && pieceToCapture.getTeamColor() != teamColor) {
                     addMove(validMoves, position, capturePos, capturePos.getRow());

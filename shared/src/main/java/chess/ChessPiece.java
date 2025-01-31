@@ -84,30 +84,44 @@ public class ChessPiece {
     }
 
     @Override
-    public String toString() {
-        char pieceChar = switch (this.type) {
-            case KING -> 'K';
-            case QUEEN -> 'Q';
-            case ROOK -> 'R';
-            case BISHOP -> 'B';
-            case KNIGHT -> 'N';
-            case PAWN -> 'P';
-        };
-        return (pieceColor == ChessGame.TeamColor.WHITE) ? Character.toString(pieceChar) : Character.toString(Character.toLowerCase(pieceChar));
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ChessPiece that = (ChessPiece) o;
-        return pieceColor == that.pieceColor && type == that.type;
+        ChessPiece piece = (ChessPiece) o;
+        return pieceColor == piece.pieceColor && type == piece.type;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(pieceColor, type);
     }
+
+    //    @Override
+//    public String toString() {
+//        char pieceChar = switch (this.type) {
+//            case KING -> 'K';
+//            case QUEEN -> 'Q';
+//            case ROOK -> 'R';
+//            case BISHOP -> 'B';
+//            case KNIGHT -> 'N';
+//            case PAWN -> 'P';
+//        };
+//        return (pieceColor == ChessGame.TeamColor.WHITE) ? Character.toString(pieceChar) : Character.toString(Character.toLowerCase(pieceChar));
+//    }
+//
+//    @Override
+//    public boolean equals(Object o) {
+//        if (o == null || getClass() != o.getClass()) {
+//            return false;
+//        }
+//        ChessPiece that = (ChessPiece) o;
+//        return pieceColor == that.pieceColor && type == that.type;
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(pieceColor, type);
+//    }
 }
 
