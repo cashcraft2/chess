@@ -97,16 +97,23 @@ public class ChessGame {
             throw new InvalidMoveException("It is not " + currentPiece.getTeamColor() + "'s turn!");
         }
 
-        Collection<ChessMove> legalMoves = currentPiece.pieceMoves(board, move.getStartPosition());
+        Collection<ChessMove> legalMoves = validMoves(move.getStartPosition());
         if (!legalMoves.contains(move)) {
             throw new InvalidMoveException("The desired move is not legal: " + move);
         }
 
+        ChessPiece simulatePiece = board.getPiece(move.getEndPosition());
         board.addPiece(move.getEndPosition(), currentPiece);
-        getBoard().addPiece(move.getStartPosition(), null);
+        board.addPiece(move.getStartPosition(), null);
 
         if(move.getPromotionPiece() != null && currentPiece.getPieceType() == ChessPiece.PieceType.PAWN){
             board.addPiece(move.getEndPosition(), new ChessPiece(currentTurn, move.getPromotionPiece()));
+        }
+
+        if (isInCheck(currentTurn)){
+            board.addPiece(move.getStartPosition(), currentPiece);
+            board.addPiece(move.getEndPosition(), simulatePiece);
+            throw new InvalidMoveException("Invalid move: Leaves King in check!");
         }
 
         if(currentTurn == TeamColor.WHITE){
