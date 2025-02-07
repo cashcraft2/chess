@@ -181,45 +181,27 @@ public class ChessGame {
             return false;
         }
 
-        ChessPosition kingPos = null;
-        ChessBoard currentBoard = getBoard();
-        for (int row = 0; row < 8; row++){
-            for (int col = 0; col < 8; col++){
-                ChessPosition currentPos = new ChessPosition(row + 1, col + 1);
-                ChessPiece currentPiece = currentBoard.getPiece(currentPos);
-                if (currentPiece != null && currentPiece.getPieceType() == ChessPiece.PieceType.KING && currentPiece.getTeamColor() == teamColor) {
-                    kingPos = currentPos;
-                    break;
-                }
-            }
-        }
-        if (kingPos == null) {
-            throw new IllegalStateException("No King detected on the board.");
-        }
-
-        Collection<ChessMove> kingMoves = validMoves(kingPos);
-        for (ChessMove move : kingMoves) {
-            ChessPiece kingPiece = currentBoard.getPiece(kingPos);
-            ChessPosition endPos = move.getEndPosition();
-            ChessBoard copyBoard = currentBoard.copyBoard();
-            copyBoard.addPiece(endPos, kingPiece);
-
-            if(!isInCheck(teamColor)){
-                return false;
-            }
-        }
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++){
-                ChessPosition currentPos = new ChessPosition(row + 1, col + 1);
-                ChessPiece currentPiece = currentBoard.getPiece(currentPos);
-                if(currentPiece != null && currentPiece.getTeamColor() == teamColor){
+        for (int row = 1; row < 8; row++){
+            for (int col = 1; col < 8; col++){
+                ChessPosition currentPos = new ChessPosition(row, col);
+                ChessPiece currentPiece = board.getPiece(currentPos);
+                if (currentPiece != null &&  currentPiece.getTeamColor() == teamColor) {
                     Collection<ChessMove> legalMoves = validMoves(currentPos);
                     for (ChessMove move : legalMoves) {
+                        ChessPosition startPos = move.getStartPosition();
                         ChessPosition endPos = move.getEndPosition();
-                        ChessBoard copyBoard = currentBoard.copyBoard();
-                        copyBoard.addPiece(endPos, currentPiece);
+                        ChessPiece startPiece = board.getPiece(startPos);
+                        ChessPiece endPiece = board.getPiece(endPos);
 
-                        if(!isInCheck(teamColor)){
+                        board.addPiece(endPos, startPiece);
+                        board.addPiece(startPos, null);
+
+                        boolean inCheck = isInCheck(teamColor);
+
+                        board.addPiece(startPos, startPiece);
+                        board.addPiece(endPos, endPiece);
+
+                        if (!inCheck) {
                             return false;
                         }
                     }
