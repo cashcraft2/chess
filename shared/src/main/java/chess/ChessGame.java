@@ -145,12 +145,9 @@ public class ChessGame {
 
                 if (currentPiece != null && currentPiece.getTeamColor() != teamColor) {
                     Collection<ChessMove> possibleMoves = currentPiece.pieceMoves(board, position);
-
-                    if(possibleMoves != null) {
-                        for(ChessMove move : possibleMoves){
-                            if(move.getEndPosition().equals(kingPos)) {
-                                return true;
-                            }
+                    for(ChessMove move : possibleMoves){
+                        if (move.getEndPosition().equals(kingPos)){
+                            return true;
                         }
                     }
                 }
