@@ -81,8 +81,6 @@ public class ChessGame {
         return legalMoves;
     }
 
-
-
     /**
      * Makes a move in a chess game
      *
@@ -146,11 +144,13 @@ public class ChessGame {
                 ChessPiece currentPiece = board.getPiece(position);
 
                 if (currentPiece != null && currentPiece.getTeamColor() != teamColor) {
-                    Collection<ChessMove> currentMoves = currentPiece.pieceMoves(board, position);
+                    Collection<ChessMove> possibleMoves = currentPiece.pieceMoves(board, position);
 
-                    for(ChessMove move : currentMoves){
-                        if(move.getEndPosition().equals(kingPos)) {
-                            return true;
+                    if(possibleMoves != null) {
+                        for(ChessMove move : possibleMoves){
+                            if(move.getEndPosition().equals(kingPos)) {
+                                return true;
+                            }
                         }
                     }
                 }
