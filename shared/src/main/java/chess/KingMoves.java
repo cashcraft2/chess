@@ -31,7 +31,7 @@ public class KingMoves {
             int newCol = currentCol + direction[1];
 
             if (!ChessPosition.isValidPosition(newRow, newCol)) {
-                break;
+                continue;
             }
             ChessPosition newPosition = new ChessPosition(newRow, newCol);
             canMove(board, position, newPosition, validMoves, currentPiece);

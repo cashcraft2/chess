@@ -26,7 +26,6 @@ public class ChessGame {
     public TeamColor getTeamTurn() {
         return currentTurn;
     }
-
     /**
      * Set's which teams turn it is
      *
@@ -60,7 +59,6 @@ public class ChessGame {
 
         Collection<ChessMove> possibleMoves = currentPiece.pieceMoves(board, startPosition);
         Collection<ChessMove> legalMoves = new ArrayList<>();
-
         for (ChessMove move : possibleMoves){
             ChessPosition startPos = move.getStartPosition();
             ChessPosition endPos = move.getEndPosition();
@@ -90,7 +88,6 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece currentPiece = board.getPiece(move.getStartPosition());
-
         if (currentPiece == null){
             throw new InvalidMoveException("No Piece at the given starting position: " + move.getStartPosition());
         }
@@ -117,7 +114,6 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), simulatePiece);
             throw new InvalidMoveException("Invalid move: Leaves King in check!");
         }
-
         if(currentTurn == TeamColor.WHITE){
             currentTurn = TeamColor.BLACK;
         }
@@ -143,7 +139,6 @@ public class ChessGame {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition position = new ChessPosition(row, col);
                 ChessPiece currentPiece = board.getPiece(position);
-
                 if (currentPiece != null && currentPiece.getTeamColor() != teamColor) {
                     Collection<ChessMove> possibleMoves = currentPiece.pieceMoves(board, position);
                     for(ChessMove move : possibleMoves){
@@ -164,7 +159,7 @@ public class ChessGame {
                 ChessPiece currentPiece = board.getPiece(position);
 
                 if (currentPiece != null && currentPiece.getPieceType() == ChessPiece.PieceType.KING && currentPiece.getTeamColor() == teamColor) {
-                   return position;
+                    return position;
                 }
             }
         }
@@ -230,7 +225,6 @@ public class ChessGame {
         }
         return true;
     }
-
     /**
      * Sets this game's chessboard with a given board
      *
@@ -251,3 +245,4 @@ public class ChessGame {
         return board;
     }
 }
+
