@@ -51,20 +51,10 @@ public class ChessPosition {
         return Objects.hash(row, col);
     }
 
-    //    @Override
-//    public boolean equals(Object object) {
-//        if (this == object) {
-//            return true;
-//        }
-//        if (object == null || getClass() != object.getClass()){
-//            return false;
-//        }
-//        ChessPosition that = (ChessPosition) object;
-//        return row == that.row && col == that.col;
-//    }
-//
-//    @Override
-//    public int hashCode(){
-//        return Objects.hash(row, col);
-//    }
+    @Override
+    public String toString() {
+        char file = (char) ('a' + this.col - 1); // Convert column to a-h
+        return "" + file + this.row; // e.g., "e2"
+    }
+
 }
