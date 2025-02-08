@@ -16,6 +16,7 @@ public class ChessGame {
 
     public ChessGame() {
         this.board = new ChessBoard();
+        this.board.resetBoard();
         this.currentTurn = TeamColor.WHITE;
     }
 
@@ -187,9 +188,16 @@ public class ChessGame {
                 ChessPiece currentPiece = board.getPiece(currentPos);
                 if (currentPiece != null &&  currentPiece.getTeamColor() == teamColor) {
                     Collection<ChessMove> legalMoves = validMoves(currentPos);
-
-                    if (legalMoves != null && !legalMoves.isEmpty()) {
-                        return false;
+                    for(ChessMove move : legalMoves){
+                        ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
+                        board.addPiece(move.getEndPosition(), currentPiece);
+                        board.addPiece(currentPos, null);
+                        boolean inCheck = isInCheck(teamColor);
+                        board.addPiece(currentPos, currentPiece);
+                        board.addPiece(move.getEndPosition(), capturedPiece);
+                        if(!inCheck){
+                            return false;
+                        }
                     }
                 }
             }
@@ -205,17 +213,16 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if(isInCheckmate(teamColor)){
+        if(isInCheck(teamColor)){
             return false;
         }
-        ChessBoard currentBoard = getBoard();
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition position = new ChessPosition(row, col);
-                ChessPiece currentPiece = currentBoard.getPiece(position);
+                ChessPiece currentPiece = board.getPiece(position);
                 if(currentPiece != null && currentPiece.getTeamColor() == teamColor){
                     Collection<ChessMove> validMoves = validMoves(position);
-                    if (validMoves == null || !validMoves.isEmpty()) {
+                    if (!validMoves.isEmpty()) {
                         return false;
                     }
                 }
