@@ -30,5 +30,8 @@ public class Server {
             // Call the ClearHandler class and pass it the request and response. Use the common json to java object class to do the conversion
             return clearHandler.clearData(request, response);
         });
+        Spark.post("/user", (request, response) -> {
+            return null;
+        });
     }
 }

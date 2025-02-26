@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
+import model.UserData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,13 +16,13 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public void createAuthToken(AuthData authData) throws DataAccessException {
+    public void createAuthToken(UserData userData) throws DataAccessException {
         String authToken = generateToken();
-        AuthData newAuthData = new AuthData(authToken, authData.username());
+        AuthData newAuthData = new AuthData(authToken,userData.username());
         if (authTokens.containsKey(newAuthData.authToken())){
             throw new DataAccessException("Error: This authToken already exists.");
         }
-        authTokens.put(authData.username(), newAuthData);
+        authTokens.put(userData.username(), newAuthData);
     }
 
     @Override
@@ -38,5 +39,13 @@ public class MemoryAuthDAO implements AuthDAO {
             throw new DataAccessException("Error: There is no existing authToken for this user.");
         }
         authTokens.remove(username);
+    }
+
+    @Override
+    public void clearAuthData() throws DataAccessException {
+        if (authTokens.isEmpty()){
+            throw new DataAccessException("Error: There are no authTokens to clear from the database.");
+        }
+        authTokens.clear();
     }
 }

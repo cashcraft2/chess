@@ -35,4 +35,12 @@ public class MemoryUserDAO implements UserDAO {
         }
         users.put(user.username(), user);
     }
+
+    @Override
+    public void clearUserData() throws DataAccessException {
+        if (users.isEmpty()){
+            throw new DataAccessException("Error: There are no users to clear from the database.");
+        }
+        users.clear();
+    }
 }
