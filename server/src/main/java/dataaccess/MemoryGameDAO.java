@@ -14,7 +14,7 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public void createGame(GameData gameData) throws DataAccessException {
         if (games.containsKey(gameData.gameID())){
-            throw new DataAccessException("Error: A game with this ID already exists.");
+            throw new DataAccessException("A game with this ID already exists.");
         }
         games.put(gameData.gameID(), gameData);
     }
@@ -23,7 +23,7 @@ public class MemoryGameDAO implements GameDAO {
     public GameData getGame(int gameID) throws DataAccessException {
         GameData game = games.get(gameID);
         if (game == null) {
-            throw new DataAccessException("Error: Game with the given game ID does not exist.");
+            throw new DataAccessException("Game with the given game ID does not exist.");
         }
         return game;
     }
@@ -31,7 +31,7 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
         if (games.isEmpty()){
-            throw new DataAccessException("Error: No existing games.");
+            throw new DataAccessException("No existing games.");
         }
         return games.values();
     }
@@ -58,7 +58,7 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public void clearGameData() throws DataAccessException {
         if (games.isEmpty()){
-            throw new DataAccessException("Error: There are no games to clear from the database.");
+            throw new DataAccessException("There are no games to clear from the database.");
         }
         games.clear();
     }

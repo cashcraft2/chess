@@ -11,27 +11,21 @@ public class MemoryUserDAO implements UserDAO {
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        if (users.containsKey(userData.username())){
-            throw new DataAccessException("Error: This username is already taken by another user.");
+        if(users.containsKey(userData.username())){
+            throw new DataAccessException("Error: already taken");
         }
         users.put(userData.username(), userData);
     }
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
-        UserData user = users.get(username);
-
-        if (user == null) {
-            throw new DataAccessException("Error: User does not exist.");
-        }
-
-        return user;
+    public UserData getUser(String username){
+        return users.get(username);
     }
 
     @Override
     public void updateUser(UserData user) throws DataAccessException {
         if (!users.containsKey(user.username())){
-            throw new DataAccessException("Error: Unable to update user. User does not exist");
+            throw new DataAccessException("Unable to update user. User does not exist");
         }
         users.put(user.username(), user);
     }
@@ -39,7 +33,7 @@ public class MemoryUserDAO implements UserDAO {
     @Override
     public void clearUserData() throws DataAccessException {
         if (users.isEmpty()){
-            throw new DataAccessException("Error: There are no users to clear from the database.");
+            throw new DataAccessException("There are no users to clear from the database.");
         }
         users.clear();
     }

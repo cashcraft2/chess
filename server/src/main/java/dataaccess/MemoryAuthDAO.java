@@ -20,7 +20,7 @@ public class MemoryAuthDAO implements AuthDAO {
         String authToken = generateToken();
         AuthData newAuthData = new AuthData(authToken,userData.username());
         if (authTokens.containsKey(newAuthData.authToken())){
-            throw new DataAccessException("Error: This authToken already exists.");
+            throw new DataAccessException("This authToken already exists.");
         }
         authTokens.put(userData.username(), newAuthData);
     }
@@ -28,7 +28,7 @@ public class MemoryAuthDAO implements AuthDAO {
     @Override
     public AuthData getAuthToken(String username) throws DataAccessException {
         if(!authTokens.containsKey(username)){
-            throw new DataAccessException("Error: There is no existing authToken for this user.");
+            throw new DataAccessException("There is no existing authToken for this user.");
         }
         return authTokens.get(username);
     }
@@ -36,7 +36,7 @@ public class MemoryAuthDAO implements AuthDAO {
     @Override
     public void deleteAuthToken(String username) throws DataAccessException {
         if (!authTokens.containsKey(username)) {
-            throw new DataAccessException("Error: There is no existing authToken for this user.");
+            throw new DataAccessException("There is no existing authToken for this user.");
         }
         authTokens.remove(username);
     }
@@ -44,7 +44,7 @@ public class MemoryAuthDAO implements AuthDAO {
     @Override
     public void clearAuthData() throws DataAccessException {
         if (authTokens.isEmpty()){
-            throw new DataAccessException("Error: There are no authTokens to clear from the database.");
+            throw new DataAccessException("There are no authTokens to clear from the database.");
         }
         authTokens.clear();
     }

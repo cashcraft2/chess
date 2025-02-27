@@ -9,7 +9,7 @@ import model.UserData;
 public class RegisterService {
 
     public record RegisterRequest(String username, String password, String email){}
-    public record RegisterResult(boolean success, String username, String authToken, String message){}
+    public record RegisterResult(int statusCode, String username, String authToken, String message){}
 
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
@@ -19,14 +19,18 @@ public class RegisterService {
         this.authDAO = authDAO;
     }
 
-    public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
-        try {
-            String username = registerRequest.username();
-            String password = registerRequest.password();
-            String email = registerRequest.email();
+    public RegisterResult register(RegisterRequest registerRequest){
+        String username = registerRequest.username();
+        String password = registerRequest.password();
+        String email = registerRequest.email();
 
-            if (!(userDAO.getUser(username) == null)) {
-                throw new DataAccessException("Error: This username already exists.");
+        if (username == null || username.isBlank() || password == null || password.isBlank() || email == null || email.isBlank()) {
+            return new RegisterResult(400, null, null, "Error: bad request");
+        }
+
+        try {
+            if (userDAO.getUser(username) != null) {
+                return new RegisterResult(403, null, null, "Error: already taken");
             }
             UserData user = new UserData(username, password, email);
             userDAO.createUser(user);
@@ -34,10 +38,11 @@ public class RegisterService {
             AuthData authData = authDAO.getAuthToken(username);
             String authToken = authData.authToken();
 
-            return new RegisterResult(true, username, authToken, null);
+            return new RegisterResult(200, username, authToken, null);
         }
+
         catch (DataAccessException error) {
-            return new RegisterResult(false, null, null, error.getMessage());
+            return new RegisterResult(500, null, null, "Error: " + error.getMessage());
         }
     }
 }

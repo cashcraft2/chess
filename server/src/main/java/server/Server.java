@@ -25,13 +25,14 @@ public class Server {
 
     private static void createRoutes(){
         ClearHandler clearHandler = new ClearHandler();
+        RegisterHandler registerHandler = new RegisterHandler();
 
         Spark.delete("/db", (request, response) -> {
             // Call the ClearHandler class and pass it the request and response. Use the common json to java object class to do the conversion
             return clearHandler.clearData(request, response);
         });
         Spark.post("/user", (request, response) -> {
-            return null;
+            return registerHandler.registerUser(request, response);
         });
     }
 }

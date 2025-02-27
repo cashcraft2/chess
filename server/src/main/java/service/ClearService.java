@@ -8,7 +8,7 @@ import dataaccess.DataAccessException;
 public class ClearService {
 
     public record ClearRequest () {}
-    public record ClearResult(boolean success, String message) {}
+    public record ClearResult(int statusCode, String message) {}
 
     private final UserDAO userDAO;
     private final GameDAO gameDAO;
@@ -26,10 +26,10 @@ public class ClearService {
             gameDAO.clearGameData();
             authDAO.clearAuthData();
 
-            return new ClearResult(true, null);
+            return new ClearResult(200, null);
         }
         catch (DataAccessException error){
-            return new ClearResult(false, error.getMessage());
+            return new ClearResult(500, "Error: " + error.getMessage());
         }
     }
 }

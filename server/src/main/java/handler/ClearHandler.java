@@ -26,12 +26,6 @@ public class ClearHandler {
 
         response.type("application/json");
 
-        if(result.success()){
-            response.status(200);
-        }
-        else{
-            response.status(500);
-        }
         return JsonHandler.toJson(result);
     }
 }
