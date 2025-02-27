@@ -7,19 +7,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryUserDAO implements UserDAO {
-    private final Map<String, UserData> users = new HashMap<>();
+    private static final Map<String, UserData> users = new HashMap<>();
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        if(users.containsKey(userData.username())){
+        String normalizedUsername = userData.username().toLowerCase();
+        if(users.containsKey(normalizedUsername)){
             throw new DataAccessException("Error: already taken");
         }
-        users.put(userData.username(), userData);
+        users.put(normalizedUsername, new UserData(normalizedUsername, userData.password(), userData.email()));
     }
 
     @Override
     public UserData getUser(String username){
-        return users.get(username);
+        return users.get(username.toLowerCase());
     }
 
     @Override
