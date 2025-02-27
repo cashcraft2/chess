@@ -1,22 +1,16 @@
 package handler;
 
-import dataaccess.DataAccessException;
+import dataaccess.*;
+import org.eclipse.jetty.server.Authentication;
 import service.ClearService;
 import service.ClearService.ClearRequest;
 import service.ClearService.ClearResult;
 import spark.Request;
 import spark.Response;
-import dataaccess.MemoryUserDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryAuthDAO;
 
 public class ClearHandler {
 
-    MemoryUserDAO userDAO = new MemoryUserDAO();
-    MemoryGameDAO gameDAO = new MemoryGameDAO();
-    MemoryAuthDAO authDAO = new MemoryAuthDAO();
-
-    public Object clearData(Request request, Response response) throws DataAccessException {
+    public Object clearData(Request request, Response response, UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) throws DataAccessException {
         // use the JsonHandler file to read in json text.
         // Call the ClearService and pass in the converted json data.
         ClearRequest clearRequest = JsonHandler.fromJson(request, ClearService.ClearRequest.class);

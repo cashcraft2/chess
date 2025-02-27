@@ -11,19 +11,18 @@ public class MemoryAuthDAO implements AuthDAO {
 
     private final Map<String, AuthData> authTokens = new HashMap<>();
 
-    public static String generateToken() {
-        return UUID.randomUUID().toString();
+
+    @Override
+    public void createAuthToken(AuthData authData) throws DataAccessException {
+        if (authTokens.containsKey(authData.authToken())){
+            throw new DataAccessException("This authToken already exists.");
+        }
+        authTokens.put(authData.authToken(), authData);
     }
 
     @Override
-    public String createAuthToken(UserData userData) throws DataAccessException {
-        String authToken = generateToken();
-        AuthData newAuthData = new AuthData(authToken,userData.username());
-        if (authTokens.containsKey(newAuthData.authToken())){
-            throw new DataAccessException("This authToken already exists.");
-        }
-        authTokens.put(userData.username(), newAuthData);
-        return authToken;
+    public AuthData getAuthData(String authToken){
+        return authTokens.get(authToken);
     }
 
     @Override
@@ -35,11 +34,11 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public void deleteAuthToken(String username) throws DataAccessException {
-        if (!authTokens.containsKey(username)) {
+    public void deleteAuthToken(String authData) throws DataAccessException {
+        if (!authTokens.containsKey(authData)) {
             throw new DataAccessException("There is no existing authToken for this user.");
         }
-        authTokens.remove(username);
+        authTokens.remove(authData);
     }
 
     @Override

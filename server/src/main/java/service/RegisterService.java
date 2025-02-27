@@ -6,6 +6,8 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 
+import java.util.UUID;
+
 public class RegisterService {
 
     public record RegisterRequest(String username, String password, String email){}
@@ -33,10 +35,12 @@ public class RegisterService {
                 return new RegisterResult(403, null, null, "Error: already taken");
             }
             UserData user = new UserData(username, password, email);
+
             userDAO.createUser(user);
-            authDAO.createAuthToken(user);
-            AuthData authData = authDAO.getAuthToken(username);
-            String authToken = authData.authToken();
+
+            String authToken = generateToken();
+            AuthData newAuthData = new AuthData(authToken,user.username());
+            authDAO.createAuthToken(newAuthData);
 
             return new RegisterResult(200, username, authToken, null);
         }
@@ -44,5 +48,8 @@ public class RegisterService {
         catch (DataAccessException error) {
             return new RegisterResult(500, null, null, "Error: " + error.getMessage());
         }
+    }
+    public static String generateToken() {
+        return UUID.randomUUID().toString();
     }
 }
