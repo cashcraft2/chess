@@ -1,6 +1,5 @@
 package handler;
 
-import dataaccess.DataAccessException;
 import service.RegisterService;
 import service.RegisterService.RegisterRequest;
 import service.RegisterService.RegisterResult;
@@ -13,7 +12,7 @@ public class RegisterHandler {
     MemoryUserDAO userDAO = new MemoryUserDAO();
     MemoryAuthDAO authDAO = new MemoryAuthDAO();
 
-    public Object registerUser(Request request, Response response) throws DataAccessException {
+    public Object registerUser(Request request, Response response) {
         RegisterRequest registerRequest = JsonHandler.fromJson(request, RegisterRequest.class);
 
         RegisterService service = new RegisterService(userDAO, authDAO);

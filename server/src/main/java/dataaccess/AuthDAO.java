@@ -3,7 +3,7 @@ import model.AuthData;
 import model.UserData;
 
 public interface AuthDAO {
-    void createAuthToken(UserData userData) throws DataAccessException;
+    String createAuthToken(UserData userData) throws DataAccessException;
 
     AuthData getAuthToken(String username) throws DataAccessException;
 

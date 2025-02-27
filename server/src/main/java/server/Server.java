@@ -1,5 +1,6 @@
 package server;
 import handler.*;
+import org.eclipse.jetty.util.log.Log;
 import spark.*;
 
 public class Server {
@@ -26,6 +27,7 @@ public class Server {
     private static void createRoutes(){
         ClearHandler clearHandler = new ClearHandler();
         RegisterHandler registerHandler = new RegisterHandler();
+        LoginHandler loginHandler = new LoginHandler();
 
         Spark.delete("/db", (request, response) -> {
             // Call the ClearHandler class and pass it the request and response. Use the common json to java object class to do the conversion
@@ -33,6 +35,9 @@ public class Server {
         });
         Spark.post("/user", (request, response) -> {
             return registerHandler.registerUser(request, response);
+        });
+        Spark.post("/session", (request, response) -> {
+            return loginHandler.loginUser(request, response);
         });
     }
 }
