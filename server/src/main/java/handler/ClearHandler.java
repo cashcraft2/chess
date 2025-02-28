@@ -1,7 +1,6 @@
 package handler;
 
 import dataaccess.*;
-import org.eclipse.jetty.server.Authentication;
 import service.ClearService;
 import service.ClearService.ClearRequest;
 import service.ClearService.ClearResult;

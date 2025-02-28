@@ -1,13 +1,10 @@
 package handler;
 
 import dataaccess.AuthDAO;
-import service.LoginService;
 import service.LogoutService;
-import service.LogoutService.LogoutRequest;
-import service.LogoutService.LogoutResult;
 import spark.Request;
 import spark.Response;
-import dataaccess.MemoryAuthDAO;
+
 
 public class LogoutHandler {
 

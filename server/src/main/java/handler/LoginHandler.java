@@ -7,8 +7,6 @@ import service.LoginService.LoginRequest;
 import service.LoginService.LoginResult;
 import spark.Request;
 import spark.Response;
-import dataaccess.MemoryUserDAO;
-import dataaccess.MemoryAuthDAO;
 
 public class LoginHandler {
 

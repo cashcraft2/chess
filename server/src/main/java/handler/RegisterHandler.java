@@ -2,14 +2,12 @@ package handler;
 
 import dataaccess.AuthDAO;
 import dataaccess.UserDAO;
-import org.eclipse.jetty.server.Authentication;
 import service.RegisterService;
 import service.RegisterService.RegisterRequest;
 import service.RegisterService.RegisterResult;
 import spark.Request;
 import spark.Response;
-import dataaccess.MemoryUserDAO;
-import dataaccess.MemoryAuthDAO;
+
 
 public class RegisterHandler {
 
