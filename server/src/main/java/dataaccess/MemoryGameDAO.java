@@ -11,6 +11,8 @@ import java.util.Random;
 public class MemoryGameDAO implements GameDAO {
 
     private final Map<String, GameData> games = new HashMap<>();
+    private final Map<Integer, GameData> gamesWithID = new HashMap<>();
+    private int nextGameId = 1;
 
     @Override
     public void createGame(String gameName) throws DataAccessException {
@@ -18,10 +20,11 @@ public class MemoryGameDAO implements GameDAO {
             throw new DataAccessException("A game with this name already exists.");
         }
         ChessGame board = new ChessGame();
-        Random random = new Random();
-        int gameId = random.nextInt(1000) + 1;
+        int gameId = nextGameId++;
+
         GameData game = new GameData(gameId, null, null, gameName, board);
         games.put(gameName, game);
+        gamesWithID.put(gameId, game);
     }
 
     @Override
@@ -30,21 +33,24 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public Collection<GameData> listGames() throws DataAccessException {
-        if (games.isEmpty()){
-            throw new DataAccessException("No existing games.");
-        }
+    public GameData getGameWithID(int gameID){
+        return gamesWithID.get(gameID);
+    }
+
+    @Override
+    public Collection<GameData> listGames(){
         return games.values();
     }
 
     @Override
     public GameData updateGame(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) throws DataAccessException {
-        GameData existingGame = games.get(gameName);
+        GameData existingGame = gamesWithID.get(gameID);
         if (existingGame == null) {
             throw new DataAccessException("The requested game does not exist.");
         }
         GameData updatedGame = new GameData(gameID, whiteUsername, blackUsername, gameName, existingGame.game());
         games.put(gameName, updatedGame);
+        gamesWithID.put(gameID, updatedGame);
         return updatedGame;
     }
 
@@ -54,6 +60,7 @@ public class MemoryGameDAO implements GameDAO {
             throw new DataAccessException("There is not current game that exists with that game ID.");
         }
         games.remove(gameData.gameName());
+        gamesWithID.remove(gameData.gameID());
     }
 
     @Override
@@ -62,5 +69,6 @@ public class MemoryGameDAO implements GameDAO {
             throw new DataAccessException("There are no games to clear from the database.");
         }
         games.clear();
+        gamesWithID.clear();
     }
 }

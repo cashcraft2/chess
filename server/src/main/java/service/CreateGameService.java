@@ -6,7 +6,6 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import spark.Request;
-
 import java.util.Collection;
 
 public class CreateGameService {

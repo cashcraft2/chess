@@ -38,6 +38,7 @@ public class Server {
         LogoutHandler logoutHandler = new LogoutHandler();
         ListGamesHandler listGamesHandler = new ListGamesHandler();
         CreateGameHandler createGameHandler = new CreateGameHandler();
+        JoinGameHandler joinGameHandler = new JoinGameHandler();
 
         Spark.delete("/db", (request, response) -> {
             // Call the ClearHandler class and pass it the request and response. Use the common json to java object class to do the conversion
@@ -57,6 +58,9 @@ public class Server {
         });
         Spark.get("/game", (request, response) -> {
             return listGamesHandler.listGames(request, response, gameDAO, authDAO);
+        });
+        Spark.put("/game", (request, response) -> {
+            return joinGameHandler.joinGame(request, response, gameDAO, authDAO);
         });
     }
 }
