@@ -34,14 +34,27 @@ public class JoinGameService {
             int gameID = joinGameRequest.gameID();
 
             GameData game = gameDAO.getGameWithID(gameID);
-            if(game.blackUsername().equals(playerColor)){
-                gameDAO.updateGame(gameID, game.whiteUsername(), playerColor, game.gameName(), game.game());
-            } else if (game.whiteUsername().equals(playerColor)) {
-                gameDAO.updateGame(gameID, playerColor, game.blackUsername(), game.gameName(), game.game());
-            }
-            return new JoinGameResult(200, null);
+            if (game == null){
+                return new JoinGameResult(400, "Error: bad request");
             }
 
+            if ("BLACK".equalsIgnoreCase(playerColor)) {
+                if (game.blackUsername() == null) {
+                    gameDAO.updateGame(gameID, game.whiteUsername(), authData.username(), game.gameName(), game.game());
+                } else {
+                    return new JoinGameResult(403, "Error: already taken");
+                }
+            } else if ("WHITE".equalsIgnoreCase(playerColor)) {
+                if (game.whiteUsername() == null) {
+                    gameDAO.updateGame(gameID, authData.username(), game.blackUsername(), game.gameName(), game.game());
+                } else {
+                    return new JoinGameResult(403, "Error: already taken");
+                }
+            } else {
+                return new JoinGameResult(400, "Error: bad request");
+            }
+            return new JoinGameResult(200, null);
+        }
         catch (DataAccessException error) {
             return new JoinGameResult(500, "Error: " + error.getMessage());
         }
