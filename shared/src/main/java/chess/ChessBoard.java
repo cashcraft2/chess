@@ -62,19 +62,6 @@ public class ChessBoard {
         }
     }
 
-    public ChessBoard copyBoard(){
-        ChessBoard copyBoard = new ChessBoard();
-        for (int row = 0; row < 8; row++){
-            for (int col = 0; col < 8; col++){
-                ChessPiece chessPiece = squares[row][col];
-                if(chessPiece != null) {
-                    copyBoard.squares[row][col] = new ChessPiece(chessPiece.getTeamColor(), chessPiece.getPieceType());
-                }
-            }
-        }
-        return copyBoard;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -88,52 +75,4 @@ public class ChessBoard {
     public int hashCode() {
         return Arrays.deepHashCode(squares);
     }
-    //    @Override
-//    public int hashCode() {
-//        int result = 17;
-//        for (int row = 0; row < 8; row++) {
-//            for (int col = 0; col < 8; col++){
-//                result = 31 * result + Objects.hashCode(squares[row][col]);
-//            }
-//        }
-//        return result;
-//    }
-//
-//    @Override
-//    public boolean equals(Object obj) {
-//        if (this == obj) {
-//            return true;
-//        }
-//        if (obj == null || getClass() != obj.getClass()){
-//            return false;
-//        }
-//        ChessBoard other = (ChessBoard) obj;
-//        for (int row = 0; row < 8; row++){
-//            for (int col = 0; col < 8; col++){
-//                ChessPiece thisPiece = this.squares[row][col];
-//                ChessPiece otherPiece = other.squares[row][col];
-//                if (!Objects.equals(thisPiece, otherPiece)){
-//                    return false;
-//                }
-//            }
-//        }
-//        return true;
-//    }
-//
-//    @Override
-//    public String toString() {
-//        StringBuilder sb = new StringBuilder();
-//        for (int row = 7; row >= 0; row--) {  // Print from top to bottom (rank 8 to 1)
-//            for (int col = 0; col < 8; col++) {
-//                ChessPiece piece = squares[row][col];
-//                if (piece == null) {
-//                    sb.append(". ");
-//                } else {
-//                    sb.append(piece.toString()).append(" ");
-//                }
-//            }
-//            sb.append("\n");
-//        }
-//        return sb.toString();
-//    }
 }

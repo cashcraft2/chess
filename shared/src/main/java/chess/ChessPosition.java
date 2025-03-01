@@ -56,5 +56,4 @@ public class ChessPosition {
         char file = (char) ('a' + this.col - 1); // Convert column to a-h
         return "" + file + this.row; // e.g., "e2"
     }
-
 }
