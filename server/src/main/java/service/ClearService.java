@@ -20,7 +20,7 @@ public class ClearService {
         this.authDAO = authDAO;
     }
 
-    public  ClearResult clear(ClearRequest clearRequest) throws DataAccessException {
+    public  ClearResult clear() {
         try{
             userDAO.clearUserData();
             gameDAO.clearGameData();

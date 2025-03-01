@@ -11,16 +11,16 @@ public class MemoryUserDAO implements UserDAO {
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        String normalizedUsername = userData.username().toLowerCase();
-        if(users.containsKey(normalizedUsername)){
+        String username = userData.username();
+        if(users.containsKey(username)){
             throw new DataAccessException("Error: already taken");
         }
-        users.put(normalizedUsername, new UserData(normalizedUsername, userData.password(), userData.email()));
+        users.put(username, new UserData(username, userData.password(), userData.email()));
     }
 
     @Override
     public UserData getUser(String username){
-        return users.get(username.toLowerCase());
+        return users.get(username);
     }
 
     @Override
@@ -32,10 +32,7 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public void clearUserData() throws DataAccessException {
-        if (users.isEmpty()){
-            throw new DataAccessException("There are no users to clear from the database.");
-        }
+    public void clearUserData() {
         users.clear();
     }
 }

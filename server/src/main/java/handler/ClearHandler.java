@@ -15,7 +15,7 @@ public class ClearHandler {
         ClearRequest clearRequest = JsonHandler.fromJson(request, ClearService.ClearRequest.class);
 
         ClearService service = new ClearService(userDAO, gameDAO, authDAO);
-        ClearResult result = service.clear(clearRequest);
+        ClearResult result = service.clear();
 
         response.type("application/json");
 

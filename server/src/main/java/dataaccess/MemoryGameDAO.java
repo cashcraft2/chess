@@ -64,10 +64,7 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public void clearGameData() throws DataAccessException {
-        if (games.isEmpty()){
-            throw new DataAccessException("There are no games to clear from the database.");
-        }
+    public void clearGameData() {
         games.clear();
         gamesWithID.clear();
     }
