@@ -13,7 +13,7 @@ public class CreateGameHandler {
         String authToken = request.headers("authorization");
 
         CreateGameService service = new CreateGameService(gameDao, authDAO);
-        CreateGameService.CreateGameResult result = service.create(authToken);
+        CreateGameService.CreateGameResult result = service.create(request, authToken);
 
         response.status(result.statusCode());
 

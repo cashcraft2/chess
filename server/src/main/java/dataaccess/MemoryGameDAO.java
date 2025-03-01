@@ -6,26 +6,27 @@ import model.GameData;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class MemoryGameDAO implements GameDAO {
 
-    private final Map<Integer, GameData> games = new HashMap<>();
+    private final Map<String, GameData> games = new HashMap<>();
 
     @Override
-    public void createGame(GameData gameData) throws DataAccessException {
-        if (games.containsKey(gameData.gameID())){
-            throw new DataAccessException("A game with this ID already exists.");
+    public void createGame(String gameName) throws DataAccessException {
+        if (games.containsKey(gameName)){
+            throw new DataAccessException("A game with this name already exists.");
         }
-        games.put(gameData.gameID(), gameData);
+        ChessGame board = new ChessGame();
+        Random random = new Random();
+        int gameId = random.nextInt(1000) + 1;
+        GameData game = new GameData(gameId, null, null, gameName, board);
+        games.put(gameName, game);
     }
 
     @Override
-    public GameData getGame(int gameID) throws DataAccessException {
-        GameData game = games.get(gameID);
-        if (game == null) {
-            throw new DataAccessException("Game with the given game ID does not exist.");
-        }
-        return game;
+    public GameData getGame(String gameName){
+        return games.get(gameName);
     }
 
     @Override
@@ -38,21 +39,21 @@ public class MemoryGameDAO implements GameDAO {
 
     @Override
     public GameData updateGame(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) throws DataAccessException {
-        GameData existingGame = games.get(gameID);
+        GameData existingGame = games.get(gameName);
         if (existingGame == null) {
             throw new DataAccessException("The requested game does not exist.");
         }
         GameData updatedGame = new GameData(gameID, whiteUsername, blackUsername, gameName, existingGame.game());
-        games.put(gameID, updatedGame);
+        games.put(gameName, updatedGame);
         return updatedGame;
     }
 
     @Override
     public void deleteGame(GameData gameData) throws DataAccessException {
-        if(!games.containsKey(gameData.gameID())){
+        if(!games.containsKey(gameData.gameName())){
             throw new DataAccessException("There is not current game that exists with that game ID.");
         }
-        games.remove(gameData.gameID());
+        games.remove(gameData.gameName());
     }
 
     @Override
