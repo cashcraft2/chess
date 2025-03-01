@@ -7,7 +7,6 @@ import dataaccess.DataAccessException;
 
 public class ClearService {
 
-    public record ClearRequest () {}
     public record ClearResult(int statusCode, String message) {}
 
     private final UserDAO userDAO;

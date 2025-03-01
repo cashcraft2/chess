@@ -5,8 +5,6 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
-import spark.Request;
-import java.util.Collection;
 
 public class JoinGameService {
     public record JoinGameRequest(String playerColor, int gameID){}
@@ -24,7 +22,6 @@ public class JoinGameService {
         if(authToken == null || authToken.isBlank()){
             return new JoinGameResult(401, "Error: unauthorized");
         }
-
         try {
             AuthData authData = authDAO.getAuthData(authToken);
             if(authData == null) {

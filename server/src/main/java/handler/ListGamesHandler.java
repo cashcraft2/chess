@@ -2,10 +2,7 @@ package handler;
 
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
-import dataaccess.UserDAO;
 import service.ListGamesService;
-import service.ListGamesService.ListGamesRequest;
-import service.ListGamesService.ListGamesResult;
 import spark.Request;
 import spark.Response;
 

@@ -2,11 +2,9 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class MemoryGameDAO implements GameDAO {
 
@@ -43,7 +41,7 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public GameData updateGame(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) throws DataAccessException {
+    public void updateGame(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) throws DataAccessException {
         GameData existingGame = gamesWithID.get(gameID);
         if (existingGame == null) {
             throw new DataAccessException("The requested game does not exist.");
@@ -51,16 +49,6 @@ public class MemoryGameDAO implements GameDAO {
         GameData updatedGame = new GameData(gameID, whiteUsername, blackUsername, gameName, existingGame.game());
         games.put(gameName, updatedGame);
         gamesWithID.put(gameID, updatedGame);
-        return updatedGame;
-    }
-
-    @Override
-    public void deleteGame(GameData gameData) throws DataAccessException {
-        if(!games.containsKey(gameData.gameName())){
-            throw new DataAccessException("There is not current game that exists with that game ID.");
-        }
-        games.remove(gameData.gameName());
-        gamesWithID.remove(gameData.gameID());
     }
 
     @Override

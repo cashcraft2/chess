@@ -8,7 +8,6 @@ import model.GameData;
 import java.util.Collection;
 
 public class ListGamesService {
-    public record ListGamesRequest(){}
     public record ListGamesResult(int statusCode, String message, Collection<GameData> games){}
 
     private final GameDAO gameDAO;

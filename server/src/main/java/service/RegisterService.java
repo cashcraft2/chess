@@ -29,7 +29,6 @@ public class RegisterService {
         if (username == null || username.isBlank() || password == null || password.isBlank() || email == null || email.isBlank()) {
             return new RegisterResult(400, null, null, "Error: bad request");
         }
-
         try {
             if (userDAO.getUser(username) != null) {
                 return new RegisterResult(403, null, null, "Error: already taken");

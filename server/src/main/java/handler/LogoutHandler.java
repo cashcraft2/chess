@@ -5,7 +5,6 @@ import service.LogoutService;
 import spark.Request;
 import spark.Response;
 
-
 public class LogoutHandler {
 
     public Object logoutUser(Request request, Response response, AuthDAO authDAO) {

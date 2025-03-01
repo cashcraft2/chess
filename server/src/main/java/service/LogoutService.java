@@ -2,11 +2,8 @@ package service;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import model.AuthData;
-import org.eclipse.jetty.server.Authentication;
-
 
 public class LogoutService {
-    public record LogoutRequest(){}
     public record LogoutResult(int statusCode, String message){}
 
     private final AuthDAO authDAO;

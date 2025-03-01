@@ -3,7 +3,6 @@ import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 import handler.*;
-import org.eclipse.jetty.util.log.Log;
 import spark.*;
 
 public class Server {
@@ -42,7 +41,7 @@ public class Server {
 
         Spark.delete("/db", (request, response) -> {
             // Call the ClearHandler class and pass it the request and response. Use the common json to java object class to do the conversion
-            return clearHandler.clearData(request, response, userDAO, authDAO, gameDAO);
+            return clearHandler.clearData(response, userDAO, authDAO, gameDAO);
         });
         Spark.post("/user", (request, response) -> {
             return registerHandler.registerUser(request, response, userDAO, authDAO);

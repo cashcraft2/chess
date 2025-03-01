@@ -5,8 +5,6 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
-import spark.Request;
-import java.util.Collection;
 
 public class CreateGameService {
     public record CreateGameRequest(String gameName){}
@@ -24,7 +22,6 @@ public class CreateGameService {
         if(authToken == null || authToken.isBlank()){
             return new CreateGameResult(401, null, "Error: unauthorized");
         }
-
         try {
             AuthData authData = authDAO.getAuthData(authToken);
             if(authData == null) {
