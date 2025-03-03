@@ -20,7 +20,7 @@ public class RegisterServiceTest {
     }
 
     @Test
-    void testRegister_Success() throws DataAccessException {
+    void testRegisterSuccess() throws DataAccessException {
         RegisterService.RegisterRequest request = new RegisterService.RegisterRequest("cotter.ashcraft", "mypassword", "cotter@gmail.com");
         RegisterService.RegisterResult result = registerService.register(request);
 
@@ -35,7 +35,7 @@ public class RegisterServiceTest {
     }
 
     @Test
-    void testRegister_alreadyExists() throws DataAccessException {
+    void testRegisterAlreadyExists() throws DataAccessException {
         UserData testUser = new UserData("cotter.ashcraft", "mypassword", "cotter@gmail.com");
         userDAO.createUser(testUser);
 
@@ -47,7 +47,7 @@ public class RegisterServiceTest {
     }
 
     @Test
-    void testRegister_badRequest() throws DataAccessException {
+    void testRegisterBadRequest() throws DataAccessException {
         UserData testUser = new UserData("cotter.ashcraft", "mypassword", "email");
         userDAO.createUser(testUser);
 
@@ -59,7 +59,7 @@ public class RegisterServiceTest {
     }
 
     @Test
-    void testRegister_uniqueToken() {
+    void testRegisterUniqueToken() {
         String data_token = RegisterService.generateToken();
         String new_token = RegisterService.generateToken();
         assertNotNull(data_token);

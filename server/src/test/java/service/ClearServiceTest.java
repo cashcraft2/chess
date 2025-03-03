@@ -25,7 +25,7 @@ public class ClearServiceTest {
     }
 
     @Test
-    void testClear_Success() throws DataAccessException {
+    void testClearSuccess() throws DataAccessException {
         UserData user = new UserData("user", "pass", "email");
         userDAO.createUser(user);
 

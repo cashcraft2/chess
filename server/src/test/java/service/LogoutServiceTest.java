@@ -22,7 +22,7 @@ public class LogoutServiceTest {
     }
 
     @Test
-    void testLogout_Success() throws DataAccessException{
+    void testLogoutSuccess() throws DataAccessException{
         UserData userData = new UserData("user", "pass", "email");
         userDAO.createUser(userData);
 
@@ -36,7 +36,7 @@ public class LogoutServiceTest {
     }
 
     @Test
-    void testLogout_unauthorized() throws DataAccessException {
+    void testLogoutUnauthorized() throws DataAccessException {
         String authToken = "fake-token";
 
         LogoutService.LogoutResult result = logoutService.logout(authToken);
@@ -46,7 +46,7 @@ public class LogoutServiceTest {
     }
 
     @Test
-    void testRegister_uniqueToken() {
+    void testRegisterUniqueToken() {
         String data_token = RegisterService.generateToken();
         String new_token = RegisterService.generateToken();
         assertNotNull(data_token);

@@ -23,7 +23,7 @@ public class ListGamesServiceTest {
     }
 
     @Test
-    void testListGames_Success() throws DataAccessException {
+    void testListGamesSuccess() throws DataAccessException {
         gameDAO.createGame("game");
         UserData userData = new UserData("user", "pass", "email");
         userDAO.createUser(userData);
@@ -38,7 +38,7 @@ public class ListGamesServiceTest {
     }
 
     @Test
-    void testListGames_unauthorized() throws DataAccessException {
+    void testListGamesUnauthorized() throws DataAccessException {
         String authToken = "invalid-token";
 
         ListGamesService.ListGamesResult result = listGamesService.list(authToken);
@@ -48,7 +48,7 @@ public class ListGamesServiceTest {
     }
 
     @Test
-    void testRegister_uniqueToken() {
+    void testRegisterUniqueToken() {
         String data_token = RegisterService.generateToken();
         String new_token = RegisterService.generateToken();
         assertNotNull(data_token);

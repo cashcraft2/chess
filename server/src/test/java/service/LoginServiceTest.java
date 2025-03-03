@@ -20,7 +20,7 @@ public class LoginServiceTest {
     }
 
     @Test
-    void testLogin_Success() throws DataAccessException{
+    void testLoginSuccess() throws DataAccessException{
         UserData userData = new UserData("user", "pass", "email");
         userDAO.createUser(userData);
 
@@ -33,7 +33,7 @@ public class LoginServiceTest {
     }
 
     @Test
-    void testLogin_unauthorized() throws DataAccessException {
+    void testLoginUnauthorized() throws DataAccessException {
         UserData userData = new UserData("user", "pass", "email");
         userDAO.createUser(userData);
 
@@ -45,7 +45,7 @@ public class LoginServiceTest {
     }
 
     @Test
-    void testRegister_uniqueToken() {
+    void testRegisterUniqueToken() {
         String data_token = RegisterService.generateToken();
         String new_token = RegisterService.generateToken();
         assertNotNull(data_token);

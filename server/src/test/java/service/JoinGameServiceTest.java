@@ -25,7 +25,7 @@ public class JoinGameServiceTest {
     }
 
     @Test
-    void testJoinGame_Success() throws DataAccessException {
+    void testJoinGameSuccess() throws DataAccessException {
         gameDAO.createGame("gameName");
         int gameID = gameDAO.getGame("gameName").gameID();
         UserData userData = new UserData("user", "pass", "email");
@@ -42,7 +42,7 @@ public class JoinGameServiceTest {
     }
 
     @Test
-    void testJoinGame_badRequest() throws DataAccessException {
+    void testJoinGameBadRequest() throws DataAccessException {
         gameDAO.createGame("gameName");
         int gameID = gameDAO.getGame("gameName").gameID();
         UserData userData = new UserData("user", "pass", "email");
@@ -59,7 +59,7 @@ public class JoinGameServiceTest {
     }
 
     @Test
-    void testJoinGame_unauthorized() throws DataAccessException {
+    void testJoinGameUnauthorized() throws DataAccessException {
         gameDAO.createGame("gameName");
         int gameID = gameDAO.getGame("gameName").gameID();
         UserData userData = new UserData("user", "pass", "email");
@@ -75,7 +75,7 @@ public class JoinGameServiceTest {
     }
 
     @Test
-    void testJoinGame_alreadyTaken() throws DataAccessException {
+    void testJoinGameAlreadyTaken() throws DataAccessException {
         gameDAO.createGame("gameName");
         int gameID = gameDAO.getGame("gameName").gameID();
         gameDAO.updateGame(gameID, "WHITE", null, "gameName", null);

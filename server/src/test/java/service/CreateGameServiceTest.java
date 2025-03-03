@@ -23,7 +23,7 @@ public class CreateGameServiceTest {
     }
 
     @Test
-    void testCreateGame_Success() throws DataAccessException {
+    void testCreateGameSuccess() throws DataAccessException {
         UserData userData = new UserData("user", "pass", "email");
         userDAO.createUser(userData);
 
@@ -38,7 +38,7 @@ public class CreateGameServiceTest {
         assertEquals(gameID, result.gameID());
     }
     @Test
-    void testCreateGame_badRequest() throws DataAccessException {
+    void testCreateGameBadRequest() throws DataAccessException {
         UserData userData = new UserData("user", "pass", "email");
         userDAO.createUser(userData);
 
@@ -52,7 +52,7 @@ public class CreateGameServiceTest {
         assertEquals("Error: bad request", result.message());
     }
     @Test
-    void testCreateGame_unauthorized() {
+    void testCreateGameUnauthorized() {
         String authToken = "invalid_token";
 
         CreateGameService.CreateGameRequest request = new CreateGameService.CreateGameRequest("gameName");
