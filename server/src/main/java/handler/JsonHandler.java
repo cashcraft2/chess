@@ -4,13 +4,13 @@ import com.google.gson.Gson;
 import spark.Request;
 
 public class JsonHandler {
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     public static <T> T fromJson (Request request, Class<T> currentClass) {
-        return gson.fromJson(request.body(), currentClass);
+        return GSON.fromJson(request.body(), currentClass);
     }
 
     public static String toJson(Object obj) {
-        return gson.toJson(obj);
+        return GSON.toJson(obj);
     }
 }

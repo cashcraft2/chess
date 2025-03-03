@@ -46,10 +46,10 @@ public class LoginServiceTest {
 
     @Test
     void testRegisterUniqueToken() {
-        String data_token = RegisterService.generateToken();
-        String new_token = RegisterService.generateToken();
-        assertNotNull(data_token);
-        assertNotNull(new_token);
-        assertNotEquals(data_token, new_token);
+        String dataToken = RegisterService.generateToken();
+        String newToken = RegisterService.generateToken();
+        assertNotNull(dataToken);
+        assertNotNull(newToken);
+        assertNotEquals(dataToken, newToken);
     }
 }
