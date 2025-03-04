@@ -84,7 +84,8 @@ public class ChessPiece {
         }
     }
 
-    public static boolean canMove(ChessBoard board, ChessPosition position, ChessPosition newPosition, List<ChessMove> validMoves) {
+    public static boolean canMove(ChessBoard board, ChessPosition position, ChessPosition newPosition,
+                                  List<ChessMove> validMoves) {
         ChessPiece pieceAtNewPos = board.getPiece(newPosition);
         ChessPiece currentPiece = board.getPiece(position);
 
@@ -101,7 +102,8 @@ public class ChessPiece {
         }
     }
 
-    public static void canMoveStep(ChessBoard board, ChessPosition position, ChessPosition newPosition, List<ChessMove> validMoves, ChessPiece currentPiece) {
+    public static void canMoveStep(ChessBoard board, ChessPosition position, ChessPosition newPosition,
+                                   List<ChessMove> validMoves, ChessPiece currentPiece) {
         ChessPiece pieceAtNewPos = board.getPiece(newPosition);
 
         if (pieceAtNewPos == null) {
