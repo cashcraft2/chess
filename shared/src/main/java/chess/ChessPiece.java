@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -80,6 +81,23 @@ public class ChessPiece {
         }
         else{
             return new ArrayList<>();
+        }
+    }
+
+    public static boolean canMove(ChessBoard board, ChessPosition position, ChessPosition newPosition, List<ChessMove> validMoves) {
+        ChessPiece pieceAtNewPos = board.getPiece(newPosition);
+        ChessPiece currentPiece = board.getPiece(position);
+
+        if (pieceAtNewPos == null) {
+            validMoves.add(new ChessMove(position, newPosition, null));
+            return true;
+        }
+        else if (pieceAtNewPos.getTeamColor() != currentPiece.getTeamColor()) {
+            validMoves.add(new ChessMove(position, newPosition, null));
+            return false;
+        }
+        else {
+            return false;
         }
     }
 

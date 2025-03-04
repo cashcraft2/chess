@@ -34,27 +34,11 @@ public class RookMoves {
 
                 ChessPosition newPosition = new ChessPosition(row, col);
 
-                if(!canMove(board, position, newPosition, validMoves)){
+                if(!ChessPiece.canMove(board, position, newPosition, validMoves)){
                     break;
                 }
             }
         }
         return validMoves;
-    }
-    private boolean canMove(ChessBoard board, ChessPosition position, ChessPosition newPosition, List<ChessMove> validMoves) {
-        ChessPiece pieceAtNewPos = board.getPiece(newPosition);
-        ChessPiece currentPiece = board.getPiece(position);
-
-        if (pieceAtNewPos == null) {
-            validMoves.add(new ChessMove(position, newPosition, null));
-            return true;
-        }
-        else if (pieceAtNewPos.getTeamColor() != currentPiece.getTeamColor()) {
-            validMoves.add(new ChessMove(position, newPosition, null));
-            return false;
-        }
-        else {
-            return false;
-        }
     }
 }
