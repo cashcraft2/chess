@@ -5,19 +5,17 @@ import java.util.List;
 
 public abstract class SlidingPieceMoves {
 
-    protected abstract int[][] directions();
-
-    public List<ChessMove> getValidMoves(ChessBoard board, ChessPosition position) throws InvalidMoveException {
+    protected List<ChessMove> getSlidingMoves(ChessBoard board, ChessPosition position, int[][] directions) {
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
 
         if (!ChessPosition.isValidPosition(currentRow, currentCol)) {
-            throw new InvalidMoveException("Invalid Position: {" + currentRow + ", " + currentCol + "}");
+            throw new IllegalArgumentException("Invalid position: <" + currentRow + "," + currentCol + ">.");
         }
 
         List<ChessMove> validMoves = new ArrayList<>();
 
-        for (int[] direction : directions()){
+        for (int[] direction : directions) {
             int row = currentRow;
             int col = currentCol;
 
@@ -25,33 +23,18 @@ public abstract class SlidingPieceMoves {
                 row += direction[0];
                 col += direction[1];
 
-                if (!ChessPosition.isValidPosition(row, col)){
+                if (!ChessPosition.isValidPosition(row, col)) {
                     break;
                 }
 
                 ChessPosition newPosition = new ChessPosition(row, col);
-                if (!canMove(board, position, newPosition, validMoves)){
+
+                if (!ChessPiece.canMove(board, position, newPosition, validMoves)) {
                     break;
                 }
             }
         }
         return validMoves;
     }
-
-    private boolean canMove(ChessBoard board, ChessPosition position,
-                            ChessPosition newPosition, List<ChessMove> validMoves) {
-
-        ChessPiece pieceAtNewPos = board.getPiece(newPosition);
-        ChessPiece currentPiece = board.getPiece(position);
-
-        if (pieceAtNewPos == null) {
-            validMoves.add(new ChessMove(position, newPosition, null));
-            return true;
-        } else if (pieceAtNewPos.getTeamColor() != currentPiece.getTeamColor()) {
-            validMoves.add(new ChessMove(position, newPosition, null));
-            return true;
-        }else {
-            return false;
-        }
-    }
 }
+
