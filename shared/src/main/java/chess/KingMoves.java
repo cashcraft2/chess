@@ -34,19 +34,8 @@ public class KingMoves {
                 continue;
             }
             ChessPosition newPosition = new ChessPosition(newRow, newCol);
-            canMove(board, position, newPosition, validMoves, currentPiece);
+            ChessPiece.canMoveStep(board, position, newPosition, validMoves, currentPiece);
         }
         return validMoves;
-    }
-
-    private void canMove(ChessBoard board, ChessPosition position, ChessPosition newPosition, List<ChessMove> validMoves, ChessPiece currentPiece) {
-        ChessPiece pieceAtNewPos = board.getPiece(newPosition);
-
-        if (pieceAtNewPos == null) {
-            validMoves.add(new ChessMove(position, newPosition, null));
-        }
-        else if (pieceAtNewPos.getTeamColor() != currentPiece.getTeamColor()) {
-            validMoves.add(new ChessMove(position, newPosition, null));
-        }
     }
 }

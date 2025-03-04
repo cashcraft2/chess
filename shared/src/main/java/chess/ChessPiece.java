@@ -101,6 +101,17 @@ public class ChessPiece {
         }
     }
 
+    public static void canMoveStep(ChessBoard board, ChessPosition position, ChessPosition newPosition, List<ChessMove> validMoves, ChessPiece currentPiece) {
+        ChessPiece pieceAtNewPos = board.getPiece(newPosition);
+
+        if (pieceAtNewPos == null) {
+            validMoves.add(new ChessMove(position, newPosition, null));
+        }
+        else if (pieceAtNewPos.getTeamColor() != currentPiece.getTeamColor()) {
+            validMoves.add(new ChessMove(position, newPosition, null));
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
