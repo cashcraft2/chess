@@ -20,17 +20,27 @@ public class MySqlAuthDAO implements AuthDAO{
 
     @Override
     public void createAuthToken(AuthData authData) throws DataAccessException {
-        String sql = "INSERT INTO authTokens (authToken) VALUES (?)";
+        String sql = """
+        INSERT INTO authTokens (id, authToken)
+        SELECT id, ? FROM users WHERE username = ?
+        ON DUPLICATE KEY UPDATE authToken = VALUES(authToken);
+        """;
+
         try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, authData.authToken());
-            statement.executeUpdate();
+            statement.setString(2, authData.username());
+
+            int rows = statement.executeUpdate();
+
+            if (rows == 0) {
+                throw new DataAccessException("Error finding user or authToken");
+            }
         }
         catch(SQLException ex) {
             throw new DataAccessException("Error adding authToken to the database: " + ex.getMessage());
         }
-
     }
 
     @Override
@@ -86,18 +96,18 @@ public class MySqlAuthDAO implements AuthDAO{
     }
 
     @Override
-    public void deleteAuthToken(String username) throws DataAccessException {
+    public void deleteAuthToken(String authToken) throws DataAccessException {
         String sql = """
                 DELETE authTokens
                 FROM authTokens
                 JOIN users ON authTokens.id = users.id
-                WHERE users.username = ?
+                WHERE authTokens.authToken = ?
                 """;
 
         try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setString(1, username);
+            statement.setString(1, authToken);
             statement.executeUpdate();
         }
         catch (SQLException ex) {
@@ -107,7 +117,7 @@ public class MySqlAuthDAO implements AuthDAO{
 
     @Override
     public void clearAuthData() throws DataAccessException {
-        String sql = "DROP TABLE authTokens";
+        String sql = "TRUNCATE TABLE authTokens";
         try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 

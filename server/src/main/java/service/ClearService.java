@@ -21,9 +21,10 @@ public class ClearService {
 
     public  ClearResult clear() {
         try{
+            authDAO.clearAuthData();
             userDAO.clearUserData();
             gameDAO.clearGameData();
-            authDAO.clearAuthData();
+
 
             return new ClearResult(200, null);
         }

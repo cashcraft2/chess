@@ -71,7 +71,7 @@ public class MySqlUserDAO implements UserDAO{
 
     @Override
     public void clearUserData() throws DataAccessException {
-        String sql = "DROP TABLE users";
+        String sql = "TRUNCATE TABLE users";
         try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
