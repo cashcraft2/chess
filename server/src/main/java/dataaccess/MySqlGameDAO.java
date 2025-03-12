@@ -72,7 +72,7 @@ public class MySqlGameDAO implements GameDAO {
 
     @Override
     public GameData getGameWithID(int gameID) throws DataAccessException {
-        String sql = "SELECT gameID, whiteUsername, blackUsername, gameName, game WHERE gameID = ?";
+        String sql = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games WHERE gameID = ?";
         try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, gameID);
