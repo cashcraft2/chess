@@ -6,6 +6,8 @@ public interface UserDAO {
 
     UserData getUser(String username) throws DataAccessException;
 
+    boolean verifyUser(String username, String password, UserData user);
+
     void clearUserData() throws DataAccessException;
 
 }

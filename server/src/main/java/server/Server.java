@@ -1,7 +1,5 @@
 package server;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import handler.*;
 import spark.*;
 
@@ -12,9 +10,13 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        MySqlUserDAO userDAO = new MySqlUserDAO();
+        MySqlAuthDAO authDAO = new MySqlAuthDAO();
+        MySqlGameDAO gameDAO = new MySqlGameDAO();
+
+        //MemoryUserDAO userDAO = new MemoryUserDAO();
+        //MemoryAuthDAO authDAO = new MemoryAuthDAO();
+        //MemoryGameDAO gameDAO = new MemoryGameDAO();
 
         // Register your endpoints and handle exceptions here.
         createRoutes(userDAO, authDAO, gameDAO);
@@ -30,7 +32,7 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private static void createRoutes(MemoryUserDAO userDAO, MemoryAuthDAO authDAO, MemoryGameDAO gameDAO){
+    private static void createRoutes(MySqlUserDAO userDAO, MySqlAuthDAO authDAO, MySqlGameDAO gameDAO){
         ClearHandler clearHandler = new ClearHandler();
         RegisterHandler registerHandler = new RegisterHandler();
         LoginHandler loginHandler = new LoginHandler();

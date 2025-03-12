@@ -31,10 +31,9 @@ public class LoginService {
 
         try {
             UserData user = userDAO.getUser(username);
-            if(user == null || !user.password().equals(password)) {
+            if (!userDAO.verifyUser(username, password, user)) {
                 return new LoginResult(401, null, null, "Error: unauthorized");
             }
-
             String authToken = generateToken();
             AuthData newAuthData = new AuthData(authToken, user.username());
             authDAO.createAuthToken(newAuthData);
