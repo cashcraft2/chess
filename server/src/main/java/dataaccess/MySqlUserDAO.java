@@ -71,14 +71,16 @@ public class MySqlUserDAO implements UserDAO{
 
     @Override
     public void clearUserData() throws DataAccessException {
-        String sql = "TRUNCATE TABLE users";
-        try (Connection connection = DatabaseManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.executeUpdate();
+        try (Connection connection = DatabaseManager.getConnection()) {
+            try (PreparedStatement firstStatement = connection.prepareStatement("DELETE FROM authTokens")) {
+                firstStatement.executeUpdate();
+            }
+            try (PreparedStatement secondStatement = connection.prepareStatement("DELETE FROM users")) {
+                secondStatement.executeUpdate();
+            }
         }
         catch (SQLException ex) {
-            throw new DataAccessException("Error dropping users table from database: " + ex.getMessage());
+            throw new DataAccessException("Error clearing users table from database: " + ex.getMessage());
         }
     }
 }

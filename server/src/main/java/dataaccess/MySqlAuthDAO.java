@@ -124,7 +124,7 @@ public class MySqlAuthDAO implements AuthDAO{
             statement.executeUpdate();
         }
         catch (SQLException ex) {
-            throw new DataAccessException("Error dropping the authTokens table in database: " + ex.getMessage());
+            throw new DataAccessException("Error clearing the authTokens table in database: " + ex.getMessage());
         }
     }
 }

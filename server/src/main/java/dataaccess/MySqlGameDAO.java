@@ -3,6 +3,9 @@ package dataaccess;
 import chess.ChessGame;
 import model.GameData;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,6 +37,14 @@ public class MySqlGameDAO implements GameDAO {
 
     @Override
     public void clearGameData() throws DataAccessException {
+        String sql = "DELETE FROM games";
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
+            statement.executeUpdate();
+        }
+        catch (SQLException ex) {
+            throw new DataAccessException("Error clearing the games table in database: " + ex.getMessage());
+        }
     }
 }
