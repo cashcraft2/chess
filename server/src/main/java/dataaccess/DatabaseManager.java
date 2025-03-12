@@ -93,7 +93,7 @@ public class DatabaseManager {
             """
             CREATE TABLE IF NOT EXISTS  games (
               `id` int NOT NULL AUTO_INCREMENT,
-              `gameID` int NOT NULL,
+              `gameID` int DEFAULT NULL,
               `whiteUsername` varchar(256) DEFAULT NULL,
               `blackUsername` varchar(256) DEFAULT NULL,
               `gameName` varchar(256) NOT NULL,

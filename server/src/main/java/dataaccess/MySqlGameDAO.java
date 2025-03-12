@@ -18,15 +18,15 @@ public class MySqlGameDAO implements GameDAO {
         String chessGame = JsonHandler.toJson(new ChessGame());
 
         try (Connection connection = DatabaseManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setString(1, gameName);
             statement.setString(2, chessGame);
             statement.executeUpdate();
 
-            try (ResultSet resultSet = statement.executeQuery()){
+            try (ResultSet resultSet = statement.getGeneratedKeys()){
                 if (resultSet.next()) {
-                    int gameID = resultSet.getInt("id");
+                    int gameID = resultSet.getInt(1);
 
                     try (PreparedStatement newStatement = connection.prepareStatement(newSql)) {
                         newStatement.setInt(1, gameID);
@@ -46,10 +46,12 @@ public class MySqlGameDAO implements GameDAO {
 
     @Override
     public GameData getGame(String gameName) throws DataAccessException {
-        String sql = "SELECT gameID, whiteUsername, blackUsername, gameName, game WHERE gameName = ?";
+        String sql = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games WHERE gameName = ?";
         try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
+
             statement.setString(1, gameName);
+
             try (ResultSet result = statement.executeQuery()) {
                 if (result.next()) {
                     int gameID = result.getInt("gameID");
