@@ -78,7 +78,7 @@ public class MySqlUserDAO implements UserDAO{
             statement.executeUpdate();
         }
         catch (SQLException ex) {
-            throw new DataAccessException("Error deleting all userData: " + ex.getMessage());
+            throw new DataAccessException("Error dropping users table from database: " + ex.getMessage());
         }
     }
 }

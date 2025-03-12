@@ -65,7 +65,7 @@ public class MySqlAuthDAO implements AuthDAO{
             SELECT authTokens.authToken, users.username 
             FROM authTokens 
             JOIN users ON authTokens.id = users.id
-            WHERE authTokens.authToken = ?;
+            WHERE users.username = ?;
         """;
 
         try (Connection connection = DatabaseManager.getConnection();
@@ -87,11 +87,34 @@ public class MySqlAuthDAO implements AuthDAO{
 
     @Override
     public void deleteAuthToken(String username) throws DataAccessException {
+        String sql = """
+                DELETE authTokens
+                FROM authTokens
+                JOIN users ON authTokens.id = users.id
+                WHERE users.username = ?
+                """;
 
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, username);
+            statement.executeUpdate();
+        }
+        catch (SQLException ex) {
+            throw new DataAccessException("Error trying to delete authData from database: " + ex.getMessage());
+        }
     }
 
     @Override
     public void clearAuthData() throws DataAccessException {
+        String sql = "DROP TABLE authTokens";
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
+            statement.executeUpdate();
+        }
+        catch (SQLException ex) {
+            throw new DataAccessException("Error dropping the authTokens table in database: " + ex.getMessage());
+        }
     }
 }
