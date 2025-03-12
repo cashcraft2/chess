@@ -95,16 +95,16 @@ public class MySqlAuthDAO implements AuthDAO{
     }
 
     @Override
-    public void deleteAuthToken(String username) throws DataAccessException {
+    public void deleteAuthToken(String authToken) throws DataAccessException {
         String sql = """
                 DELETE FROM authTokens
-                WHERE id = (SELECT id FROM users WHERE username = ?);
+                WHERE authToken = ?;
                 """;
 
         try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setString(1, username);
+            statement.setString(1, authToken);
             statement.executeUpdate();
         }
         catch (SQLException ex) {

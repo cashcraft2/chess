@@ -21,7 +21,7 @@ public class LogoutService {
             if(authData == null){
                 return new LogoutResult(401, "Error: unauthorized");
             }
-            authDAO.deleteAuthToken(authData.username());
+            authDAO.deleteAuthToken(authData.authToken());
 
             if(!(authDAO.getAuthData(authToken) == null)) {
                 return new LogoutResult(401, "Error: unauthorized");
