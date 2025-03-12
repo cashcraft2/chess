@@ -22,8 +22,7 @@ public class MySqlAuthDAO implements AuthDAO{
     public void createAuthToken(AuthData authData) throws DataAccessException {
         String sql = """
         INSERT INTO authTokens (id, authToken)
-        VALUES ((SELECT id FROM users WHERE username = ?),?)
-        ON DUPLICATE KEY UPDATE authToken = VALUES(authToken);
+        VALUES ((SELECT id FROM users WHERE username = ?),?);
         """;
 
         try (Connection connection = DatabaseManager.getConnection();
@@ -96,18 +95,16 @@ public class MySqlAuthDAO implements AuthDAO{
     }
 
     @Override
-    public void deleteAuthToken(String authToken) throws DataAccessException {
+    public void deleteAuthToken(String username) throws DataAccessException {
         String sql = """
-                DELETE authTokens
-                FROM authTokens
-                JOIN users ON authTokens.id = users.id
-                WHERE authTokens.authToken = ?
+                DELETE FROM authTokens
+                WHERE id = (SELECT id FROM users WHERE username = ?);
                 """;
 
         try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setString(1, authToken);
+            statement.setString(1, username);
             statement.executeUpdate();
         }
         catch (SQLException ex) {

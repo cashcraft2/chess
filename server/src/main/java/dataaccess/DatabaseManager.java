@@ -84,9 +84,9 @@ public class DatabaseManager {
             """,
             """
             CREATE TABLE IF NOT EXISTS  authTokens (
-              `id` int NOT NULL,
               `authToken` varchar(256) NOT NULL UNIQUE,
-              PRIMARY KEY (`id`),
+              `id` INT NOT NULL,
+              PRIMARY KEY (`authToken`),
               FOREIGN KEY (`id`) REFERENCES users(`id`) ON DELETE CASCADE
             );
             """,
