@@ -41,6 +41,9 @@ public class MySqlUserDAO implements UserDAO{
 
     @Override
     public boolean verifyUser(String username, String password, UserData user) {
+        if(user == null) {
+            return false;
+        }
         if (username == null) {
             return false;
         }

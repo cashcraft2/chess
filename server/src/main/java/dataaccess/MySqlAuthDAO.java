@@ -22,15 +22,15 @@ public class MySqlAuthDAO implements AuthDAO{
     public void createAuthToken(AuthData authData) throws DataAccessException {
         String sql = """
         INSERT INTO authTokens (id, authToken)
-        SELECT id, ? FROM users WHERE username = ?
+        VALUES ((SELECT id FROM users WHERE username = ?),?)
         ON DUPLICATE KEY UPDATE authToken = VALUES(authToken);
         """;
 
         try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setString(1, authData.authToken());
-            statement.setString(2, authData.username());
+            statement.setString(1, authData.username());
+            statement.setString(2, authData.authToken());
 
             int rows = statement.executeUpdate();
 
