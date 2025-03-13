@@ -3,7 +3,6 @@ package dataaccess;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
