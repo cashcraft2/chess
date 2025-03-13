@@ -14,10 +14,6 @@ public class Server {
         MySqlAuthDAO authDAO = new MySqlAuthDAO();
         MySqlGameDAO gameDAO = new MySqlGameDAO();
 
-        //MemoryUserDAO userDAO = new MemoryUserDAO();
-        //MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        //MemoryGameDAO gameDAO = new MemoryGameDAO();
-
         // Register your endpoints and handle exceptions here.
         createRoutes(userDAO, authDAO, gameDAO);
         //This line initializes the server and can be removed once you have a functioning endpoint 
