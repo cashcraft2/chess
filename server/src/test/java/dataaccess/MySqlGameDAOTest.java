@@ -16,13 +16,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MySqlGameDAOTest {
     private GameDAO gameDAO;
-    private AuthDAO authDAO;
-    private UserDAO userDAO;
 
     @BeforeAll
     void setup() {
-        userDAO = new MySqlUserDAO();
-        authDAO = new MySqlAuthDAO();
         gameDAO = new MySqlGameDAO();
     }
 
