@@ -2,12 +2,8 @@ package dataaccess;
 
 import chess.ChessGame;
 import handler.JsonHandler;
-import model.AuthData;
 import model.GameData;
-import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.*;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -118,9 +114,58 @@ public class MySqlGameDAOTest {
     }
 
     @Test
-    void testListGamesFailure() throws Exception{
+    void testListGamesEmpty() throws Exception {
+        // Ensure the database is empty before the test.
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement("DELETE FROM games")) {
+            statement.executeUpdate();
+        }
+
+        // Call listGames when no games are in the database
         Collection<GameData> games = gameDAO.listGames();
+
+        // Assert that the result is an empty collection, not null
+        assertNotNull(games);
         assertTrue(games.isEmpty());
+    }
+
+
+    @Test
+    void testUpdateGameSuccess() throws Exception {
+        // Create a game first
+        String initialGameName = "InitialGame";
+        gameDAO.createGame(initialGameName);
+
+        // Retrieve the newly created game ID
+        GameData initialGame = gameDAO.listGames().stream()
+                .filter(game -> game.gameName().equals(initialGameName))
+                .findFirst()
+                .orElseThrow(() -> new Exception("Game not found"));
+
+        int gameID = initialGame.gameID();
+        String updatedGameName = "UpdatedGame";
+
+        // Update game details
+        gameDAO.updateGame(gameID, "newWhitePlayer", "newBlackPlayer", updatedGameName,
+                new ChessGame());
+
+        // Retrieve updated game
+        GameData updatedGame = gameDAO.getGameWithID(gameID);
+
+        // Assertions
+        assertEquals(updatedGameName, updatedGame.gameName());
+        assertEquals("newWhitePlayer", updatedGame.whiteUsername());
+        assertEquals("newBlackPlayer", updatedGame.blackUsername());
+    }
+
+    @Test
+    void testUpdateGameFailure() {
+        ChessGame game = new ChessGame();
+        int fakeGameID = 999;
+
+        assertThrows(DataAccessException.class, () ->
+                        gameDAO.updateGame(fakeGameID, "playerWhite", "playerBlack",
+                                "Nonexistent Game", game));
     }
 
 
