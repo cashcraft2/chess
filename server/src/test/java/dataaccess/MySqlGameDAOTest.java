@@ -4,7 +4,6 @@ import chess.ChessGame;
 import handler.JsonHandler;
 import model.GameData;
 import org.junit.jupiter.api.*;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,12 +41,11 @@ public class MySqlGameDAOTest {
 
             assertTrue(result.next());
             assertEquals(gameName, result.getString("gameName"));
-            assertNotNull(result.getInt("gameID"));
         }
     }
 
     @Test
-    void testCreateGameFailure() throws Exception {
+    void testCreateGameFailure()  {
         assertThrows(DataAccessException.class, () -> gameDAO.createGame(null));
     }
 
