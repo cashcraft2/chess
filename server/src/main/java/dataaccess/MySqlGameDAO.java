@@ -4,7 +4,6 @@ import chess.ChessGame;
 import handler.JsonHandler;
 import model.GameData;
 import com.google.gson.Gson;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
