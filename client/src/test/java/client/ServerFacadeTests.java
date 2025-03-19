@@ -2,6 +2,7 @@ package client;
 
 import dataaccess.DatabaseManager;
 import exception.ResponseException;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -38,7 +39,7 @@ public class ServerFacadeTests {
 
     @Test
     public void testClearDatabaseSuccess() throws Exception {
-        var authData = facade.registerUser(new UserData("username", "password", "email"));
+        facade.registerUser(new UserData("username", "password", "email"));
 
         facade.clearDatabase();
 
@@ -57,6 +58,25 @@ public class ServerFacadeTests {
     @Test
     public void testRegisterUserSuccess() throws Exception {
         var authData = facade.registerUser(new UserData("username", "password", "email"));
+        assertNotNull(authData.authToken());
+        assertEquals("username", authData.username());
+    }
+
+    @Test
+    public void testRegisterUserFailure() throws Exception {
+        UserData userData = new UserData("username", "password", null);
+
+        assertThrows(ResponseException.class, () -> {
+            facade.registerUser(userData);
+        });
+    }
+
+    @Test
+    public void testLoginUserSuccess() throws Exception {
+        UserData userData = new UserData("username", "password", "email");
+        facade.registerUser(userData);
+        AuthData authData = facade.loginUser(userData);
+
         assertNotNull(authData.authToken());
         assertEquals("username", authData.username());
     }
