@@ -63,7 +63,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testRegisterUserFailure() throws Exception {
+    public void testRegisterUserFailure() {
         UserData userData = new UserData("username", "password", null);
 
         assertThrows(ResponseException.class, () -> {
@@ -80,4 +80,46 @@ public class ServerFacadeTests {
         assertNotNull(authData.authToken());
         assertEquals("username", authData.username());
     }
+
+    @Test
+    public void testLoginUserFailure() {
+        UserData userData = new UserData("username", "password", null);
+
+        assertThrows(ResponseException.class, () -> {
+            facade.loginUser(userData);
+        });
+    }
+
+    @Test
+    public void testLogoutUserSuccess() throws Exception {
+        UserData userData = new UserData("username", "password", "email");
+        facade.registerUser(userData);
+
+        AuthData authData = facade.loginUser(userData);
+        String authToken = authData.authToken();
+        assertNotNull(authToken);
+
+        facade.logoutUser(authToken);
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM authTokens")) {
+            var result = statement.executeQuery();
+            result.next();
+            assertFalse(result.next());
+        }
+    }
+
+    @Test
+    public void testLogoutUserFailure() throws Exception {
+        UserData userData = new UserData("username", "password", "email");
+        facade.registerUser(userData);
+
+        AuthData authData = facade.loginUser(userData);
+
+        assertThrows(ResponseException.class, () -> {
+            facade.logoutUser("invalidAuthToken");
+        });
+    }
+
+
 }

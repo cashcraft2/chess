@@ -19,52 +19,58 @@ public class ServerFacade {
 
     public void clearDatabase() throws ResponseException {
         var path = "/db";
-        this.makeRequest("DELETE", path, null, null);
+        this.makeRequest("DELETE", path, null, null, null);
     }
 
     public AuthData registerUser(UserData user) throws ResponseException {
         var path = "/user";
-        return this.makeRequest("POST", path, user, AuthData.class);
+        return this.makeRequest("POST", path, user, AuthData.class, null);
     }
 
     public AuthData loginUser(UserData user) throws ResponseException {
         var path = "/session";
-        return this.makeRequest("POST", path, user, AuthData.class);
+        return this.makeRequest("POST", path, user, AuthData.class, null);
     }
 
-    public void logoutUser() throws ResponseException {
+    public void logoutUser(String authToken) throws ResponseException {
         var path = "/session";
-        this.makeRequest("DELETE", path, null, null);
+        this.makeRequest("DELETE", path, null, null, authToken);
     }
 
-    public Collection<GameData> listGames() throws ResponseException {
+    public Collection<GameData> listGames(String authToken) throws ResponseException {
         var path = "/game";
 
         record ListGamesResponse(Collection<GameData> games){}
 
-        var response = this.makeRequest("GET", path, null, ListGamesResponse.class);
+        var response = this.makeRequest("GET", path, null, ListGamesResponse.class, authToken);
         return response.games();
     }
 
-    public GameData createGame(GameData game) throws ResponseException {
+    public GameData createGame(GameData game, String authToken) throws ResponseException {
         var path = "/game";
-        return this.makeRequest("POST", path, game, GameData.class);
+        return this.makeRequest("POST", path, game, GameData.class, authToken);
     }
 
-    public void joinGame(GameData game) throws ResponseException {
+    public void joinGame(GameData game, String authToken) throws ResponseException {
         var path = "/game";
-        this.makeRequest("PUT", path, game, null);
+        this.makeRequest("PUT", path, game, null, authToken);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass)
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken)
             throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
-
-            writeBody(request, http);
+            if(!(authToken == null) && request == null){
+                http.addRequestProperty("authorization", authToken);
+            } else if (!(authToken == null && request == null)) {
+                http.addRequestProperty("authorization", authToken);
+                writeBody(request, http);
+            }else {
+                writeBody(request, http);
+            }
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
