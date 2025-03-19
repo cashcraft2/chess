@@ -1,10 +1,14 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import exception.ResponseException;
+import model.GameData;
+import model.UserData;
 
 import java.io.*;
 import java.net.*;
+import java.util.Collection;
 
 public class ServerFacade {
 
@@ -14,9 +18,40 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public void clearDatabase(){
-        String path = "/db";
+    public void clearDatabase() throws ResponseException {
+        var path = "/db";
+        this.makeRequest("DELETE", path, null, null);
+    }
 
+    public UserData registerUser(UserData user) throws ResponseException {
+        var path = "/user";
+        return this.makeRequest("POST", path, user, UserData.class);
+    }
+
+    public UserData loginUser(UserData user) throws ResponseException {
+        var path = "/session";
+        return this.makeRequest("POST", path, user, UserData.class);
+    }
+
+    public void logoutUser() throws ResponseException {
+        var path = "/session";
+        this.makeRequest("DELETE", path, null, null);
+    }
+
+    public Collection<GameData> listGames() throws ResponseException {
+        var path = "/game";
+
+        return this.makeRequest("GET", path, null, );
+    }
+
+    public GameData createGame(GameData game) throws ResponseException {
+        var path = "/game";
+        return this.makeRequest("POST", path, game, GameData.class);
+    }
+
+    public void joinGame(GameData game) throws ResponseException {
+        var path = "/game";
+        this.makeRequest("PUT", path, game, null);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass)
