@@ -159,4 +159,42 @@ public class ServerFacadeTests {
             facade.listGames("invalidAuthToken");
         });
     }
+
+    @Test
+    public void testCreateGameSuccess() throws Exception {
+        UserData userData = new UserData("username", "password", "email");
+        facade.registerUser(userData);
+
+        AuthData authData = facade.loginUser(userData);
+        String authToken = authData.authToken();
+        assertNotNull(authToken);
+
+        GameData game = new GameData
+                (123, null, null, "gameName", new ChessGame());
+        facade.createGame(game, authToken);
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM games")) {
+            var result = statement.executeQuery();
+            assertTrue(result.next());
+        }
+    }
+
+    @Test
+    public void testCreateGameFailure() throws Exception {
+        UserData userData = new UserData("username", "password", "email");
+        facade.registerUser(userData);
+
+        AuthData authData = facade.loginUser(userData);
+        String authToken = authData.authToken();
+        assertNotNull(authToken);
+
+        GameData game = new GameData
+                (123, null, null, null, new ChessGame());
+
+        assertThrows(ResponseException.class, () -> {
+            facade.createGame(game, authToken);
+        });
+    }
+
 }
