@@ -41,7 +41,10 @@ public class ServerFacade {
     public Collection<GameData> listGames() throws ResponseException {
         var path = "/game";
 
-        return this.makeRequest("GET", path, null, );
+        record ListGamesResponse(Collection<GameData> games){}
+
+        var response = this.makeRequest("GET", path, null, ListGamesResponse.class);
+        return response.games();
     }
 
     public GameData createGame(GameData game) throws ResponseException {
