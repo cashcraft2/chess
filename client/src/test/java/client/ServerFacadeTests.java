@@ -1,8 +1,10 @@
 package client;
 
+import chess.ChessGame;
 import dataaccess.DatabaseManager;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -10,6 +12,7 @@ import server.ServerFacade;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -121,5 +124,39 @@ public class ServerFacadeTests {
         });
     }
 
+    @Test
+    public void testListGamesSuccess() throws Exception {
+        UserData userData = new UserData("username", "password", "email");
+        facade.registerUser(userData);
 
+        AuthData authData = facade.loginUser(userData);
+        String authToken = authData.authToken();
+        assertNotNull(authToken);
+
+        GameData game = new GameData
+                (123, null, null, "gameName", new ChessGame());
+        facade.createGame(game, authToken);
+        Collection<GameData> games = facade.listGames(authToken);
+
+        assertNotNull(games);
+        assertFalse(games.isEmpty());
+    }
+
+    @Test
+    public void testListGamesFailure() throws Exception {
+        UserData userData = new UserData("username", "password", "email");
+        facade.registerUser(userData);
+
+        AuthData authData = facade.loginUser(userData);
+        String authToken = authData.authToken();
+        assertNotNull(authToken);
+
+        GameData game = new GameData
+                (123, null, null, "gameName", new ChessGame());
+        facade.createGame(game, authToken);
+
+        assertThrows(ResponseException.class, () -> {
+            facade.listGames("invalidAuthToken");
+        });
+    }
 }
