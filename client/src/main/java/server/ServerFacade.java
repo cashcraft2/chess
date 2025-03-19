@@ -1,11 +1,10 @@
 package server;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import exception.ResponseException;
+import model.AuthData;
 import model.GameData;
 import model.UserData;
-
 import java.io.*;
 import java.net.*;
 import java.util.Collection;
@@ -23,9 +22,9 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, null, null);
     }
 
-    public UserData registerUser(UserData user) throws ResponseException {
+    public AuthData registerUser(UserData user) throws ResponseException {
         var path = "/user";
-        return this.makeRequest("POST", path, user, UserData.class);
+        return this.makeRequest("POST", path, user, AuthData.class);
     }
 
     public UserData loginUser(UserData user) throws ResponseException {
