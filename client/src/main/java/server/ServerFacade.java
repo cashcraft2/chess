@@ -8,13 +8,16 @@ import model.UserData;
 import java.io.*;
 import java.net.*;
 import java.util.Collection;
+import com.google.gson.Gson;
 
 public class ServerFacade {
 
     private final String serverUrl;
+    private static final Gson GSON = new Gson();
 
     public ServerFacade(String url) {
         serverUrl = url;
+
     }
 
     public void clearDatabase() throws ResponseException {
@@ -51,9 +54,12 @@ public class ServerFacade {
         return this.makeRequest("POST", path, game, GameData.class, authToken);
     }
 
-    public void joinGame(GameData game, String authToken) throws ResponseException {
+    public void joinGame(String team, int gameID, String authToken) throws ResponseException {
         var path = "/game";
-        this.makeRequest("PUT", path, game, null, authToken);
+        record joinRequest(String playerColor, int gameID){}
+        var request = new joinRequest(team, gameID);
+        var response = this.makeRequest("PUT", path, request, null, authToken);
+        System.out.println("Server Response: " + response);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken)

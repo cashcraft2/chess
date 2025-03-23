@@ -197,4 +197,49 @@ public class ServerFacadeTests {
         });
     }
 
+    @Test
+    public void testJoinGameSuccess() throws Exception {
+        UserData userData = new UserData("username", "password", "email");
+        facade.registerUser(userData);
+
+        AuthData authData = facade.loginUser(userData);
+        String authToken = authData.authToken();
+        assertNotNull(authToken);
+
+        ChessGame chessGame = new ChessGame();
+
+        GameData game = new GameData
+                (123, null, null, "gameName", chessGame);
+        GameData createdGame = facade.createGame(game, authToken);
+        int gameID = createdGame.gameID();
+        facade.joinGame("WHITE", gameID, authToken);
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM games")) {
+            var result = statement.executeQuery();
+            result.next();
+            assertEquals("username", result.getString("whiteUsername"));
+        }
+    }
+
+    @Test
+    public void testJoinGameFailure() throws Exception {
+        UserData userData = new UserData("username", "password", "email");
+        facade.registerUser(userData);
+
+        AuthData authData = facade.loginUser(userData);
+        String authToken = authData.authToken();
+        assertNotNull(authToken);
+
+        ChessGame chessGame = new ChessGame();
+
+        GameData game = new GameData
+                (123, null, null, "gameName", chessGame);
+        GameData createdGame = facade.createGame(game, authToken);
+        int gameID = createdGame.gameID();
+
+        assertThrows(ResponseException.class, () -> {
+            facade.joinGame("GREY", gameID, authToken);
+        });
+    }
 }
