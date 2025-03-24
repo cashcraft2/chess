@@ -1,9 +1,7 @@
 package client;
 
 import java.util.Scanner;
-
 import ui.EscapeSequences;
-import ui.EscapeSequences.*;
 
 public class Repl {
     private final PreloginClient preClient;
