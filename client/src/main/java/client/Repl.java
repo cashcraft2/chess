@@ -18,8 +18,8 @@ public class Repl {
 
     public void run() {
         System.out.println(EscapeSequences.BLACK_KING +
-                EscapeSequences.SET_TEXT_COLOR_YELLOW + "Welcome to the game of Chess! Type Help to get started."
-                + EscapeSequences.SET_TEXT_COLOR_BLACK +  EscapeSequences.BLACK_KING);
+                EscapeSequences.SET_TEXT_COLOR_YELLOW + "Welcome to the game of Chess! Register or Login to begin."
+                + EscapeSequences.SET_TEXT_COLOR_WHITE +  EscapeSequences.BLACK_KING);
         //System.out.print(preClient.help());
         Scanner scanner = new Scanner(System.in);
         String result = "";
@@ -38,17 +38,17 @@ public class Repl {
                 if (result.equalsIgnoreCase("login successful")) {
                     replState = ReplState.POSTLOGIN;
                     System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result +
-                            EscapeSequences.SET_TEXT_COLOR_BLACK);
+                            EscapeSequences.SET_TEXT_COLOR_WHITE);
                 } else if (result.equalsIgnoreCase("game started")) {
                     replState = ReplState.INGAME;
                     System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result +
-                            EscapeSequences.SET_TEXT_COLOR_BLACK);
+                            EscapeSequences.SET_TEXT_COLOR_WHITE);
                 }
 
                 System.out.print(result);
             } catch (Exception ex) {
                 System.out.print(
-                        EscapeSequences.SET_TEXT_COLOR_RED + ex.getMessage() + EscapeSequences.SET_BG_COLOR_BLACK);
+                        EscapeSequences.SET_TEXT_COLOR_RED + ex.getMessage() + EscapeSequences.SET_TEXT_COLOR_WHITE);
             }
         }
         System.out.println();

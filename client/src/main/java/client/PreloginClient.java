@@ -1,7 +1,11 @@
 package client;
 
 import exception.ResponseException;
+import model.UserData;
 import server.ServerFacade;
+import ui.EscapeSequences;
+
+
 
 import java.util.Arrays;
 
@@ -35,11 +39,34 @@ public class PreloginClient {
         return null;
     }
 
-    private String login(String[] params) {
-        return null;
+    private String login(String... params) throws ResponseException {
+        if (params.length >= 2) {
+            String username = params[0];
+            String password = params[1];
+
+            UserData user = new UserData(username, password, null);
+            server.loginUser(user);
+            return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You logged in as %s" +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE, username);
+        }
+        throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
+                "Error: Incorrect input. Expected: <username> <password>" + EscapeSequences.SET_TEXT_COLOR_WHITE);
     }
 
-    private String register(String[] params) {
-        return null;
+    private String register(String... params) throws ResponseException {
+        if (params.length >= 3) {
+            String username = params[0];
+            String password = params[1];
+            String email = params[2];
+
+            UserData user = new UserData(username, password, email);
+            server.registerUser(user);
+            return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You successfully registered %s" +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE, username);
+        }
+        throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
+                "Error: Incorrect input. Expected: <username> <password> <email>" +
+                EscapeSequences.SET_TEXT_COLOR_WHITE);
     }
+
 }
