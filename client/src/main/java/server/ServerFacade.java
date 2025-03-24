@@ -8,16 +8,13 @@ import model.UserData;
 import java.io.*;
 import java.net.*;
 import java.util.Collection;
-import com.google.gson.Gson;
 
 public class ServerFacade {
 
     private final String serverUrl;
-    private static final Gson GSON = new Gson();
 
     public ServerFacade(String url) {
         serverUrl = url;
-
     }
 
     public void clearDatabase() throws ResponseException {
