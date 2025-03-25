@@ -4,6 +4,7 @@ import chess.ChessGame;
 import exception.ResponseException;
 import model.GameData;
 import server.ServerFacade;
+import ui.ChessBoardRenderer;
 import ui.EscapeSequences;
 
 import java.util.Arrays;

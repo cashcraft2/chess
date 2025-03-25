@@ -1,6 +1,9 @@
 package client;
 
 import java.util.Scanner;
+import chess.ChessGame;
+import chess.ChessBoard;
+import ui.ChessBoardRenderer;
 import ui.EscapeSequences;
 
 public class Repl {
@@ -9,12 +12,15 @@ public class Repl {
     private final InGameClient gameClient;
     private ReplState replState;
     private String authToken = null;
+    private final ChessBoard board;
 
     public Repl(String serverUrl) {
         preClient = new PreloginClient(serverUrl);
         postClient = new PostloginClient(serverUrl);
         gameClient = new InGameClient(serverUrl);
         replState = ReplState.PRELOGIN;
+        board = new ChessBoard();
+        board.resetBoard();
     }
 
     public void run() {
@@ -45,13 +51,20 @@ public class Repl {
                     continue;
                 }
 
-                if (result.equalsIgnoreCase("game started")) {
+                if (result.contains("You successfully joined the game as team: WHITE")) {
                     replState = ReplState.INGAME;
-                    System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result +
-                            EscapeSequences.SET_TEXT_COLOR_WHITE);
+                    ChessBoardRenderer.setBoard(board, true);
+                    continue;
+                }
+                if (result.contains("You successfully joined the game as team: BLACK")) {
+                    replState = ReplState.INGAME;
+                    ChessBoardRenderer.setBoard(board, false);
+                    //System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result +
+                            //EscapeSequences.SET_TEXT_COLOR_WHITE);
+                    continue;
                 }
 
-                if (result.equalsIgnoreCase("return") && replState == ReplState.POSTLOGIN) {
+                if (result.contains("return") && replState == ReplState.POSTLOGIN) {
                     replState = ReplState.PRELOGIN;
                     System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + "Successfully logged out" +
                             EscapeSequences.SET_TEXT_COLOR_WHITE);
