@@ -41,6 +41,7 @@ public class Repl {
                     authToken = preClient.getAuthToken();
                     replState = ReplState.POSTLOGIN;
                     System.out.print(result);
+                    System.out.print(postClient.help());
                     continue;
                 }
 
@@ -48,6 +49,13 @@ public class Repl {
                     replState = ReplState.INGAME;
                     System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result +
                             EscapeSequences.SET_TEXT_COLOR_WHITE);
+                }
+
+                if (result.equalsIgnoreCase("return") && replState == ReplState.POSTLOGIN) {
+                    replState = ReplState.PRELOGIN;
+                    System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + "Successfully logged out" +
+                            EscapeSequences.SET_TEXT_COLOR_WHITE);
+                    System.out.print(preClient.help());
                 }
 
                 System.out.print(result);
@@ -61,7 +69,7 @@ public class Repl {
     }
 
     private void printPrompt() {
-        System.out.println("\n" + EscapeSequences.SET_TEXT_COLOR_GREEN + ">>> " + EscapeSequences.SET_TEXT_COLOR_BLACK);
+        System.out.println("\n" + EscapeSequences.SET_TEXT_COLOR_GREEN + ">>> " + EscapeSequences.SET_TEXT_COLOR_WHITE);
     }
 
     private enum ReplState {
