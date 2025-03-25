@@ -53,9 +53,13 @@ public class PostloginClient {
 
     private String joinGame(String authToken, String... params) throws ResponseException {
         if (params.length >= 2) {
-            String teamColor = params[0];
+            String teamColor = params[0].toUpperCase();
             int gameID = Integer.parseInt(params[1]);
             int selectedGame = Integer.parseInt(params[1]);
+
+            if (gameIdMap.isEmpty()) {
+                listGames(authToken);
+            }
 
             if (!gameIdMap.containsKey(selectedGame)) {
                 throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
@@ -64,6 +68,34 @@ public class PostloginClient {
             }
 
             int actualGameId = gameIdMap.get(selectedGame);
+
+            Collection<GameData> games = server.listGames(authToken);
+
+            GameData chosenGame = null;
+            for (GameData game : games) {
+                if (game.gameID() == actualGameId) {
+                    chosenGame = game;
+                    break;
+                }
+            }
+
+            if (chosenGame == null) {
+                throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Error: Game not found. Type 'list' to see the full list of available games" +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE);
+            }
+
+            // Check if the team is already filled
+            if ("WHITE".equals(teamColor) && chosenGame.whiteUsername() != null) {
+                throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Error: White team is already taken. Choose BLACK or another game." +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE);
+            }
+            if ("BLACK".equals(teamColor) && chosenGame.blackUsername() != null) {
+                throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Error: Black team is already taken. Choose WHITE or another game." +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE);
+            }
 
             server.joinGame(teamColor, actualGameId, authToken);
             return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You successfully joined the game as team: %s" +
