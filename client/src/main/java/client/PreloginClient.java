@@ -1,6 +1,7 @@
 package client;
 
 import exception.ResponseException;
+import model.AuthData;
 import model.UserData;
 import server.ServerFacade;
 import ui.EscapeSequences;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 public class PreloginClient {
     private final ServerFacade server;
     private final String serverUrl;
+    private String authToken;
 
     public PreloginClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -35,8 +37,14 @@ public class PreloginClient {
         }
     }
 
-    private String help() {
-        return null;
+    public String help() {
+        return EscapeSequences.SET_TEXT_ITALIC + """
+                                    
+                                    --OPTIONS--
+                       - register <username> <password> <email>
+                       - login <username> <password>
+                       - quit
+                """ + EscapeSequences.RESET_TEXT_ITALIC;
     }
 
     private String login(String... params) throws ResponseException {
@@ -45,7 +53,8 @@ public class PreloginClient {
             String password = params[1];
 
             UserData user = new UserData(username, password, null);
-            server.loginUser(user);
+            AuthData authData = server.loginUser(user);
+            this.authToken = authData.authToken();
             return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You logged in as %s" +
                     EscapeSequences.SET_TEXT_COLOR_WHITE, username);
         }
@@ -68,5 +77,7 @@ public class PreloginClient {
                 "Error: Incorrect input. Expected: <username> <password> <email>" +
                 EscapeSequences.SET_TEXT_COLOR_WHITE);
     }
-
+    public String getAuthToken(){
+        return authToken;
+    }
 }

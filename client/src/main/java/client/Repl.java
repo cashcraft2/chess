@@ -8,6 +8,7 @@ public class Repl {
     private final PostloginClient postClient;
     private final InGameClient gameClient;
     private ReplState replState;
+    private String authToken = null;
 
     public Repl(String serverUrl) {
         preClient = new PreloginClient(serverUrl);
@@ -17,10 +18,11 @@ public class Repl {
     }
 
     public void run() {
-        System.out.println(EscapeSequences.BLACK_KING +
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.BLACK_QUEEN +
                 EscapeSequences.SET_TEXT_COLOR_YELLOW + "Welcome to the game of Chess! Register or Login to begin."
-                + EscapeSequences.SET_TEXT_COLOR_WHITE +  EscapeSequences.BLACK_KING);
-        //System.out.print(preClient.help());
+                + EscapeSequences.SET_TEXT_COLOR_WHITE +  EscapeSequences.BLACK_QUEEN);
+
+        System.out.print(preClient.help());
         Scanner scanner = new Scanner(System.in);
         String result = "";
 
@@ -31,21 +33,25 @@ public class Repl {
             try {
                 switch (replState) {
                     case PRELOGIN -> result = preClient.eval(line);
-                    case POSTLOGIN -> result = postClient.eval(line);
+                    case POSTLOGIN -> result = postClient.eval(line, authToken);
                     case INGAME -> result = gameClient.eval(line);
                 }
 
-                if (result.equalsIgnoreCase("login successful")) {
+                if (result.contains("You logged in as")) {
+                    authToken = preClient.getAuthToken();
                     replState = ReplState.POSTLOGIN;
-                    System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result +
-                            EscapeSequences.SET_TEXT_COLOR_WHITE);
-                } else if (result.equalsIgnoreCase("game started")) {
+                    System.out.print(result);
+                    continue;
+                }
+
+                if (result.equalsIgnoreCase("game started")) {
                     replState = ReplState.INGAME;
                     System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result +
                             EscapeSequences.SET_TEXT_COLOR_WHITE);
                 }
 
                 System.out.print(result);
+
             } catch (Exception ex) {
                 System.out.print(
                         EscapeSequences.SET_TEXT_COLOR_RED + ex.getMessage() + EscapeSequences.SET_TEXT_COLOR_WHITE);
