@@ -8,10 +8,13 @@ import ui.EscapeSequences;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PostloginClient {
     private final ServerFacade server;
     private final String serverUrl;
+    private final Map<Integer, Integer> gameIdMap = new HashMap<>();
 
     public PostloginClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -52,8 +55,17 @@ public class PostloginClient {
         if (params.length >= 2) {
             String teamColor = params[0];
             int gameID = Integer.parseInt(params[1]);
+            int selectedGame = Integer.parseInt(params[1]);
 
-            server.joinGame(teamColor, gameID, authToken);
+            if (!gameIdMap.containsKey(selectedGame)) {
+                throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Error: Invalid game number. Type 'list' to see available games." +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE);
+            }
+
+            int actualGameId = gameIdMap.get(selectedGame);
+
+            server.joinGame(teamColor, actualGameId, authToken);
             return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You successfully joined the game as team: %s" +
                     EscapeSequences.SET_TEXT_COLOR_WHITE, teamColor);
         }
@@ -78,8 +90,18 @@ public class PostloginClient {
     private String listGames(String authToken) throws ResponseException {
         if(authToken != null) {
             Collection<GameData> games = server.listGames(authToken);
-            return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "List of games: %s" +
-                    EscapeSequences.SET_TEXT_COLOR_WHITE, games);
+            StringBuilder result = new StringBuilder(EscapeSequences.SET_TEXT_COLOR_BLUE);
+            result.append("List of games:\n");
+
+            gameIdMap.clear();
+            int index = 1;
+            for (GameData game : games) {
+                gameIdMap.put(index, game.gameID());
+                result.append(String.format("%d. %s (White: %s, Black: %s)\n", index++,
+                        game.gameName(), game.whiteUsername(), game.blackUsername()));
+            }
+            result.append(EscapeSequences.SET_TEXT_COLOR_WHITE);
+            return result.toString();
         }
         throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
                 "Error: unauthorized" + EscapeSequences.SET_TEXT_COLOR_WHITE);
