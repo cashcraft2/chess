@@ -55,8 +55,7 @@ public class ServerFacade {
         var path = "/game";
         record JoinRequest(String playerColor, int gameID){}
         var request = new JoinRequest(team, gameID);
-        var response = this.makeRequest("PUT", path, request, null, authToken);
-        System.out.println("Server Response: " + response);
+        this.makeRequest("PUT", path, request, null, authToken);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken)
