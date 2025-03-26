@@ -5,7 +5,6 @@ import exception.ResponseException;
 import model.GameData;
 import server.ServerFacade;
 import ui.EscapeSequences;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,12 +12,10 @@ import java.util.Map;
 
 public class PostloginClient {
     private final ServerFacade server;
-    private final String serverUrl;
     private final Map<Integer, Integer> gameIdMap = new HashMap<>();
 
     public PostloginClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
-        this.serverUrl = serverUrl;
     }
 
     public String eval(String input, String authToken) {
@@ -118,8 +115,8 @@ public class PostloginClient {
                         (null, null, null, gameName, new ChessGame());
 
                 server.createGame(game, authToken);
-                return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You successfully created a game called: %s" +
-                        EscapeSequences.SET_TEXT_COLOR_WHITE, gameName);
+                return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE +
+                        "You successfully created a game called: %s" + EscapeSequences.SET_TEXT_COLOR_WHITE, gameName);
             }
         }
         return EscapeSequences.SET_TEXT_COLOR_RED +
@@ -153,7 +150,7 @@ public class PostloginClient {
                 EscapeSequences.SET_TEXT_COLOR_WHITE;
     }
 
-    private String logout(String authToken) throws ResponseException {
+    private String logout(String authToken) {
         if (authToken != null) {
             try {
                 server.logoutUser(authToken);

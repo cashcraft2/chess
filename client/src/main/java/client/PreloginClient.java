@@ -5,19 +5,14 @@ import model.AuthData;
 import model.UserData;
 import server.ServerFacade;
 import ui.EscapeSequences;
-
-
-
 import java.util.Arrays;
 
 public class PreloginClient {
     private final ServerFacade server;
-    private final String serverUrl;
     private String authToken;
 
     public PreloginClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
-        this.serverUrl = serverUrl;
     }
 
     public String eval(String input) {
@@ -47,7 +42,7 @@ public class PreloginClient {
                 """ + EscapeSequences.RESET_TEXT_ITALIC;
     }
 
-    private String login(String... params) throws ResponseException {
+    private String login(String... params) {
         if (params.length >= 2) {
             String username = params[0];
             String password = params[1];
@@ -69,7 +64,7 @@ public class PreloginClient {
                 EscapeSequences.SET_TEXT_COLOR_WHITE;
     }
 
-    private String register(String... params) throws ResponseException {
+    private String register(String... params) {
         if (params.length >= 3) {
             String username = params[0];
             String password = params[1];

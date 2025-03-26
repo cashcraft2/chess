@@ -117,8 +117,6 @@ public class ServerFacadeTests {
         UserData userData = new UserData("username", "password", "email");
         facade.registerUser(userData);
 
-        AuthData authData = facade.loginUser(userData);
-
         assertThrows(ResponseException.class, () -> {
             facade.logoutUser("invalidAuthToken");
         });

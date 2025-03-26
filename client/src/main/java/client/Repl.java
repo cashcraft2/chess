@@ -1,7 +1,6 @@
 package client;
 
 import java.util.Scanner;
-import chess.ChessGame;
 import chess.ChessBoard;
 import ui.ChessBoardRenderer;
 import ui.EscapeSequences;
@@ -59,8 +58,6 @@ public class Repl {
                 if (result.contains("You successfully joined the game as team: BLACK")) {
                     replState = ReplState.INGAME;
                     ChessBoardRenderer.setBoard(board, false);
-                    //System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result +
-                            //EscapeSequences.SET_TEXT_COLOR_WHITE);
                     continue;
                 }
 
