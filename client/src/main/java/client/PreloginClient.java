@@ -52,14 +52,21 @@ public class PreloginClient {
             String username = params[0];
             String password = params[1];
 
-            UserData user = new UserData(username, password, null);
-            AuthData authData = server.loginUser(user);
-            this.authToken = authData.authToken();
-            return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You logged in as %s" +
-                    EscapeSequences.SET_TEXT_COLOR_WHITE, username);
+            try{
+                UserData user = new UserData(username, password, null);
+                AuthData authData = server.loginUser(user);
+                this.authToken = authData.authToken();
+                return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You logged in as %s" +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE, username);
+            } catch (ResponseException ex) {
+                return EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Error: Incorrect username or password" +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE;
+            }
         }
-        throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
-                "Error: Incorrect input. Expected: <username> <password>" + EscapeSequences.SET_TEXT_COLOR_WHITE);
+        return EscapeSequences.SET_TEXT_COLOR_RED +
+                "Error: Incorrect username or password" +
+                EscapeSequences.SET_TEXT_COLOR_WHITE;
     }
 
     private String register(String... params) throws ResponseException {
@@ -67,16 +74,22 @@ public class PreloginClient {
             String username = params[0];
             String password = params[1];
             String email = params[2];
-
-            UserData user = new UserData(username, password, email);
-            server.registerUser(user);
-            return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You successfully registered %s" +
-                    EscapeSequences.SET_TEXT_COLOR_WHITE, username);
+            try {
+                UserData user = new UserData(username, password, email);
+                server.registerUser(user);
+                return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You successfully registered %s" +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE, username);
+            } catch (ResponseException ex) {
+                return EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Error: This user already exists. Please try a different username." +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE;
+            }
         }
-        throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
+        return EscapeSequences.SET_TEXT_COLOR_RED +
                 "Error: Incorrect input. Expected: <username> <password> <email>" +
-                EscapeSequences.SET_TEXT_COLOR_WHITE);
+                EscapeSequences.SET_TEXT_COLOR_WHITE;
     }
+
     public String getAuthToken(){
         return authToken;
     }

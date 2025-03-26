@@ -4,7 +4,6 @@ import chess.ChessGame;
 import exception.ResponseException;
 import model.GameData;
 import server.ServerFacade;
-import ui.ChessBoardRenderer;
 import ui.EscapeSequences;
 
 import java.util.Arrays;
@@ -55,74 +54,87 @@ public class PostloginClient {
     private String joinGame(String authToken, String... params) throws ResponseException {
         if (params.length >= 2) {
             String teamColor = params[0].toUpperCase();
-            int gameID = Integer.parseInt(params[1]);
-            int selectedGame = Integer.parseInt(params[1]);
+            int selectedGame;
+
+            try{
+                selectedGame = Integer.parseInt(params[1]);
+            } catch (NumberFormatException ex) {
+                return EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Error: Invalid game ID. It must be a number." +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE;
+            }
 
             if (gameIdMap.isEmpty()) {
                 listGames(authToken);
             }
 
             if (!gameIdMap.containsKey(selectedGame)) {
-                throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
+                return EscapeSequences.SET_TEXT_COLOR_RED +
                         "Error: Invalid game number. Type 'list' to see available games." +
-                        EscapeSequences.SET_TEXT_COLOR_WHITE);
+                        EscapeSequences.SET_TEXT_COLOR_WHITE;
             }
 
             int actualGameId = gameIdMap.get(selectedGame);
 
             Collection<GameData> games = server.listGames(authToken);
 
-            GameData chosenGame = null;
-            for (GameData game : games) {
-                if (game.gameID() == actualGameId) {
-                    chosenGame = game;
-                    break;
-                }
-            }
+            GameData chosenGame = games.stream()
+                    .filter(game -> game.gameID() == actualGameId)
+                    .findFirst()
+                    .orElse(null);
 
             if (chosenGame == null) {
-                throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
-                        "Error: Game not found. Type 'list' to see the full list of available games" +
-                        EscapeSequences.SET_TEXT_COLOR_WHITE);
+                return EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Error: Game not found. Type 'list' to see the full list of available games." +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE;
             }
 
             // Check if the team is already filled
             if ("WHITE".equals(teamColor) && chosenGame.whiteUsername() != null) {
-                throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
+                return EscapeSequences.SET_TEXT_COLOR_RED +
                         "Error: White team is already taken. Choose BLACK or another game." +
-                        EscapeSequences.SET_TEXT_COLOR_WHITE);
+                        EscapeSequences.SET_TEXT_COLOR_WHITE;
             }
             if ("BLACK".equals(teamColor) && chosenGame.blackUsername() != null) {
-                throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
+                return EscapeSequences.SET_TEXT_COLOR_RED +
                         "Error: Black team is already taken. Choose WHITE or another game." +
-                        EscapeSequences.SET_TEXT_COLOR_WHITE);
+                        EscapeSequences.SET_TEXT_COLOR_WHITE;
             }
 
             server.joinGame(teamColor, actualGameId, authToken);
             return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You successfully joined the game as team: %s" +
                     EscapeSequences.SET_TEXT_COLOR_WHITE, teamColor);
         }
-        throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
-                "Error: Incorrect input. Expected: <BLACK/WHITE> <game ID>" + EscapeSequences.SET_TEXT_COLOR_WHITE);
+        return EscapeSequences.SET_TEXT_COLOR_RED +
+                "Error: Incorrect input. Expected: <BLACK/WHITE> <game ID>" +
+                EscapeSequences.SET_TEXT_COLOR_WHITE;
     }
 
     private String createGame(String authToken, String... params) throws ResponseException {
-        if (params.length >= 1) {
-            String gameName = params[0];
-            GameData game = new GameData
-                    (null, null, null, gameName, new ChessGame());
+        if (params.length == 1) {
+            if (!params[0].trim().isEmpty()) {
+                String gameName = params[0].trim();
+                GameData game = new GameData
+                        (null, null, null, gameName, new ChessGame());
 
-            server.createGame(game, authToken);
-            return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You successfully created a game called: %s" +
-                    EscapeSequences.SET_TEXT_COLOR_WHITE, gameName);
+                server.createGame(game, authToken);
+                return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You successfully created a game called: %s" +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE, gameName);
+            }
         }
-        throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
-                "Error: Incorrect input. Expected: <game name>" + EscapeSequences.SET_TEXT_COLOR_WHITE);
+        return EscapeSequences.SET_TEXT_COLOR_RED +
+                "Error: Incorrect input. Expected: 'create <game name>'cre" +
+                EscapeSequences.SET_TEXT_COLOR_WHITE;
     }
 
     private String listGames(String authToken) throws ResponseException {
         if(authToken != null) {
             Collection<GameData> games = server.listGames(authToken);
+            if (games == null) {
+                return EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Error: Unable to retrieve game list. Please create a game." +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE;
+            }
             StringBuilder result = new StringBuilder(EscapeSequences.SET_TEXT_COLOR_BLUE);
             result.append("List of games:\n");
 
@@ -136,16 +148,24 @@ public class PostloginClient {
             result.append(EscapeSequences.SET_TEXT_COLOR_WHITE);
             return result.toString();
         }
-        throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
-                "Error: unauthorized" + EscapeSequences.SET_TEXT_COLOR_WHITE);
+        return EscapeSequences.SET_TEXT_COLOR_RED +
+                "Error: Unauthorized access." +
+                EscapeSequences.SET_TEXT_COLOR_WHITE;
     }
 
     private String logout(String authToken) throws ResponseException {
         if (authToken != null) {
-            server.logoutUser(authToken);
-            return "return";
+            try {
+                server.logoutUser(authToken);
+                return "return";
+            }catch (Exception ex) {
+                return EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Error: Logout failed. Please try again." +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE;
+            }
         }
-        throw new ResponseException(400, EscapeSequences.SET_TEXT_COLOR_RED +
-                "Error: unauthorized" + EscapeSequences.SET_TEXT_COLOR_WHITE);
+        return EscapeSequences.SET_TEXT_COLOR_RED +
+                "Error: Unauthorized access." +
+                EscapeSequences.SET_TEXT_COLOR_WHITE;
     }
 }
