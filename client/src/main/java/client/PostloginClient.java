@@ -29,6 +29,7 @@ public class PostloginClient {
                 case "list" -> listGames(authToken);
                 case "create" -> createGame(authToken, params);
                 case "join" -> joinGame(authToken, params);
+                case "spectate" -> spectateGame( authToken, params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -45,12 +46,21 @@ public class PostloginClient {
                        - list
                        - create <game name>
                        - join <BLACK/WHITE> <game ID>
+                       - spectate <game ID> 
+                       - help
                 """ + EscapeSequences.RESET_TEXT_ITALIC;
     }
 
     private String joinGame(String authToken, String... params) throws ResponseException {
         if (params.length >= 2) {
             String teamColor = params[0].toUpperCase();
+
+            if (!"WHITE".equals(teamColor) && !"BLACK".equals(teamColor)) {
+                return EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Error: Invalid team color. Please choose 'WHITE' or 'BLACK'." +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE;
+            }
+
             int selectedGame;
 
             try{
@@ -86,7 +96,6 @@ public class PostloginClient {
                         EscapeSequences.SET_TEXT_COLOR_WHITE;
             }
 
-            // Check if the team is already filled
             if ("WHITE".equals(teamColor) && chosenGame.whiteUsername() != null) {
                 return EscapeSequences.SET_TEXT_COLOR_RED +
                         "Error: White team is already taken. Choose BLACK or another game." +
@@ -104,6 +113,48 @@ public class PostloginClient {
         }
         return EscapeSequences.SET_TEXT_COLOR_RED +
                 "Error: Incorrect input. Expected: <BLACK/WHITE> <game ID>" +
+                EscapeSequences.SET_TEXT_COLOR_WHITE;
+    }
+
+    private String spectateGame(String authToken, String...params) throws ResponseException {
+        if (params.length < 1) {
+            return EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Error: Invalid input. Expected: <game ID>" +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        }
+        int selectedGames;
+        try {
+            selectedGames = Integer.parseInt(params[0]);
+        } catch (NumberFormatException ex){
+            return EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Error: Invalid game ID. Must be a number" +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        }
+        if (gameIdMap.isEmpty()) {
+            listGames(authToken);
+        }
+
+        if (!gameIdMap.containsKey(selectedGames)) {
+            return EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Error: Game does not exist. Type 'list' to see available games." +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        }
+
+        int actualGameId = gameIdMap.get(selectedGames);
+        Collection<GameData> games = server.listGames(authToken);
+
+        GameData chosenGame = games.stream()
+                .filter(game -> game.gameID() == actualGameId)
+                .findFirst()
+                .orElse(null);
+
+        if (chosenGame == null) {
+            return EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Error: Game does not exist. Type 'list' to see available games." +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        }
+        return EscapeSequences.SET_TEXT_COLOR_BLUE +
+                "You are now spectating the game." +
                 EscapeSequences.SET_TEXT_COLOR_WHITE;
     }
 

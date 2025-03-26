@@ -26,7 +26,7 @@ public class ChessBoardRenderer {
                     boardRow = row + 1;
                     boardCol = 8 - col;
                 }
-                boolean isLightSpace = (boardRow + boardCol) % 2 == 0;
+                boolean isLightSpace = (boardRow + boardCol) % 2 != 0;
                 String spaceColor = isLightSpace ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY :
                         EscapeSequences.SET_BG_COLOR_DARK_GREY;
 

@@ -72,6 +72,8 @@ public class PreloginClient {
             try {
                 UserData user = new UserData(username, password, email);
                 server.registerUser(user);
+                AuthData authData = server.loginUser(user);
+                this.authToken = authData.authToken();
                 return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You successfully registered %s" +
                         EscapeSequences.SET_TEXT_COLOR_WHITE, username);
             } catch (ResponseException ex) {

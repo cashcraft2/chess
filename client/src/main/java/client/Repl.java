@@ -50,14 +50,30 @@ public class Repl {
                     continue;
                 }
 
+                if (result.contains("You successfully registered")) {
+                    authToken = preClient.getAuthToken();
+                    replState = ReplState.POSTLOGIN;
+                    System.out.print(result);
+                    System.out.print(postClient.help());
+                    continue;
+                }
+
                 if (result.contains("You successfully joined the game as team: WHITE")) {
                     replState = ReplState.INGAME;
                     ChessBoardRenderer.setBoard(board, true);
+                    System.out.print(result);
                     continue;
                 }
                 if (result.contains("You successfully joined the game as team: BLACK")) {
                     replState = ReplState.INGAME;
                     ChessBoardRenderer.setBoard(board, false);
+                    System.out.print(result);
+                    continue;
+                }
+                if (result.contains("You are now spectating the game")) {
+                    replState = ReplState.INGAME;
+                    ChessBoardRenderer.setBoard(board, true);
+                    System.out.print(result);
                     continue;
                 }
 
