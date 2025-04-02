@@ -4,8 +4,10 @@ import java.util.Scanner;
 import chess.ChessBoard;
 import ui.ChessBoardRenderer;
 import ui.EscapeSequences;
+import websocket.messages.ServerMessage;
+import websocket.MessageHandler;
 
-public class Repl {
+public class Repl implements MessageHandler {
     private final PreloginClient preClient;
     private final PostloginClient postClient;
     private final InGameClient gameClient;
@@ -16,7 +18,7 @@ public class Repl {
     public Repl(String serverUrl) {
         preClient = new PreloginClient(serverUrl);
         postClient = new PostloginClient(serverUrl);
-        gameClient = new InGameClient(serverUrl);
+        gameClient = new InGameClient(serverUrl, this);
         replState = ReplState.PRELOGIN;
         board = new ChessBoard();
         board.resetBoard();
@@ -96,6 +98,11 @@ public class Repl {
 
     private void printPrompt() {
         System.out.println("\n" + EscapeSequences.SET_TEXT_COLOR_GREEN + ">>> " + EscapeSequences.SET_TEXT_COLOR_WHITE);
+    }
+
+    public void notify(ServerMessage message) {
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + message);
+        printPrompt();
     }
 
     private enum ReplState {
