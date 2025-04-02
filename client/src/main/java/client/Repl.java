@@ -41,7 +41,7 @@ public class Repl implements MessageHandler {
                 switch (replState) {
                     case PRELOGIN -> result = preClient.eval(line);
                     case POSTLOGIN -> result = postClient.eval(line, authToken);
-                    case INGAME -> result = gameClient.eval(line);
+                    case INGAME -> result = gameClient.eval(line, authToken);
                 }
 
                 if (result.contains("You logged in as")) {

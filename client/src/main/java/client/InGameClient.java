@@ -17,7 +17,7 @@ public class InGameClient {
         this.messageHandler = messageHandler;
     }
 
-    public String eval(String input) {
+    public String eval(String input, String authToken) {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
@@ -25,11 +25,11 @@ public class InGameClient {
 
             return switch (cmd) {
                 case "quit" -> "quit";
-                case "redraw" -> redrawBoard();
-                case "leave" -> leaveGame();
-                case "move" -> makeMove();
-                case "resign" -> resign();
-                case "highlight" -> highlightLegalMoves();
+                case "redraw" -> redrawBoard(authToken);
+                case "leave" -> leaveGame(authToken);
+                case "move" -> makeMove(authToken);
+                case "resign" -> resign(authToken);
+                case "highlight" -> highlightLegalMoves(authToken);
                 default -> help();
             };
         } catch (Exception ex) {
@@ -37,23 +37,23 @@ public class InGameClient {
         }
     }
 
-    private String redrawBoard() {
+    private String redrawBoard(String authToken) {
         return null;
     }
 
-    private String leaveGame() {
+    private String leaveGame(String authToken) {
         return null;
     }
 
-    private String makeMove() {
+    private String makeMove(String authToken) {
         return null;
     }
 
-    private String resign() {
+    private String resign(String authToken) {
         return null;
     }
 
-    private String highlightLegalMoves() {
+    private String highlightLegalMoves(String authToken) {
         return null;
     }
 
