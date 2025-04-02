@@ -3,10 +3,10 @@ package websocket;
 import javax.websocket.Endpoint;
 import javax.websocket.*;
 import com.google.gson.Gson;
-import com.sun.nio.sctp.NotificationHandler;
 import exception.ResponseException;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
+import javax.websocket.MessageHandler;
 
 import java.io.IOException;
 import java.net.URI;
@@ -17,12 +17,38 @@ public class WebSocketFacade extends Endpoint {
     NotificationHandler notificationHandler;
 
     public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
-        // Write stuff
+        try {
+            url = url.replace("http", "ws");
+            URI socketUri = new URI(url + "/ws");
+            this.notificationHandler = notificationHandler;
+
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            this.session = container.connectToServer(this, socketUri);
+
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @Override
+                public void onMessage(String message) {
+                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
+                    notificationHandler.notify(serverMessage);
+                }
+            });
+        }
+        catch (DeploymentException | IOException | URISyntaxException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
     }
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-
+    public void connectToGame(String authToken, Integer gameID) throws ResponseException {
+        try {
+            var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        }
+        catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
 }

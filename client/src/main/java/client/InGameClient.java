@@ -2,16 +2,16 @@ package client;
 
 import server.ServerFacade;
 import ui.EscapeSequences;
-import websocket.MessageHandler;
+import websocket.NotificationHandler;
 
 import java.util.Arrays;
 
 public class InGameClient {
     private final ServerFacade server;
     private final String serverUrl;
-    private final MessageHandler messageHandler;
+    private final NotificationHandler messageHandler;
 
-    public InGameClient(String serverUrl, MessageHandler messageHandler) {
+    public InGameClient(String serverUrl, NotificationHandler messageHandler) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         this.messageHandler = messageHandler;

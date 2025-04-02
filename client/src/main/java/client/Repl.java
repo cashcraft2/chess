@@ -5,9 +5,9 @@ import chess.ChessBoard;
 import ui.ChessBoardRenderer;
 import ui.EscapeSequences;
 import websocket.messages.ServerMessage;
-import websocket.MessageHandler;
+import websocket.NotificationHandler;
 
-public class Repl implements MessageHandler {
+public class Repl implements NotificationHandler {
     private final PreloginClient preClient;
     private final PostloginClient postClient;
     private final InGameClient gameClient;
