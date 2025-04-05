@@ -45,9 +45,9 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void connectToGame(String authToken, Integer gameID) throws ResponseException {
+    public void connectToGame(String authToken, Integer gameID, String username) throws ResponseException {
         try {
-            var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+            var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, username);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         }
         catch (IOException ex) {
@@ -55,9 +55,9 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void makeMove(String authToken, Integer gameID, ChessMove move) throws ResponseException {
+    public void makeMove(String authToken, Integer gameID, ChessMove move, String username) throws ResponseException {
         try {
-            var command = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
+            var command = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move, username);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         }
         catch (IOException ex){
@@ -65,9 +65,9 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void leaveGame(String authToken, Integer gameID) throws ResponseException {
+    public void leaveGame(String authToken, Integer gameID, String username) throws ResponseException {
         try {
-            var command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+            var command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID, username);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
             this.session.close();
         }
@@ -76,9 +76,9 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void resignGame(String authToken, Integer gameID) throws ResponseException {
+    public void resignGame(String authToken, Integer gameID, String username) throws ResponseException {
         try {
-            var command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+            var command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID, username);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
             this.session.close();
         }

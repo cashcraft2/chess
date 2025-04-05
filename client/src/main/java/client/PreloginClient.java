@@ -10,6 +10,7 @@ import java.util.Arrays;
 public class PreloginClient {
     private final ServerFacade server;
     private String authToken;
+    private String username;
 
     public PreloginClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -51,6 +52,7 @@ public class PreloginClient {
                 UserData user = new UserData(username, password, null);
                 AuthData authData = server.loginUser(user);
                 this.authToken = authData.authToken();
+                this.username = username;
                 return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You logged in as %s" +
                         EscapeSequences.SET_TEXT_COLOR_WHITE, username);
             } catch (ResponseException ex) {
@@ -74,6 +76,7 @@ public class PreloginClient {
                 server.registerUser(user);
                 AuthData authData = server.loginUser(user);
                 this.authToken = authData.authToken();
+                this.username = username;
                 return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You successfully registered %s" +
                         EscapeSequences.SET_TEXT_COLOR_WHITE, username);
             } catch (ResponseException ex) {
@@ -89,5 +92,9 @@ public class PreloginClient {
 
     public String getAuthToken(){
         return authToken;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

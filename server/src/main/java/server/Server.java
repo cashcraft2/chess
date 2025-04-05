@@ -1,7 +1,10 @@
 package server;
 import dataaccess.*;
 import handler.*;
+import server.websocket.WebSocketHandler;
 import spark.*;
+
+import javax.websocket.WebSocketContainer;
 
 public class Server {
 
@@ -10,12 +13,13 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
+        WebSocketHandler webSocketHandler = new WebSocketHandler();
         MySqlUserDAO userDAO = new MySqlUserDAO();
         MySqlAuthDAO authDAO = new MySqlAuthDAO();
         MySqlGameDAO gameDAO = new MySqlGameDAO();
 
 
-        createRoutes(userDAO, authDAO, gameDAO);
+        createRoutes(userDAO, authDAO, gameDAO, webSocketHandler);
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
 
@@ -28,7 +32,8 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private static void createRoutes(MySqlUserDAO userDAO, MySqlAuthDAO authDAO, MySqlGameDAO gameDAO){
+    private static void createRoutes(MySqlUserDAO userDAO, MySqlAuthDAO authDAO, MySqlGameDAO gameDAO,
+                                     WebSocketHandler webSocketHandler){
         ClearHandler clearHandler = new ClearHandler();
         RegisterHandler registerHandler = new RegisterHandler();
         LoginHandler loginHandler = new LoginHandler();
@@ -36,6 +41,8 @@ public class Server {
         ListGamesHandler listGamesHandler = new ListGamesHandler();
         CreateGameHandler createGameHandler = new CreateGameHandler();
         JoinGameHandler joinGameHandler = new JoinGameHandler();
+
+        Spark.webSocket("/ws", webSocketHandler);
 
         Spark.delete("/db", (request, response) -> {
             // Call the ClearHandler class and pass it the request and response. Use the common json to java object class to do the conversion
