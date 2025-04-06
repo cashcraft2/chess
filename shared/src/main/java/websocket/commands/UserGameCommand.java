@@ -20,11 +20,15 @@ public class UserGameCommand {
 
     private final String username;
 
-    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, String username) {
+    private final String teamColor;
+
+    public UserGameCommand(CommandType commandType, String authToken, Integer gameID,
+                           String username, String teamColor) {
         this.commandType = commandType;
         this.authToken = authToken;
         this.gameID = gameID;
         this.username = username;
+        this.teamColor = teamColor;
     }
 
     public enum CommandType {

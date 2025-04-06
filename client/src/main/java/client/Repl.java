@@ -15,6 +15,7 @@ public class Repl implements NotificationHandler {
     private String authToken = null;
     private final ChessBoard board;
     private String username = null;
+    private String teamColor = null;
 
     public Repl(String serverUrl) {
         preClient = new PreloginClient(serverUrl);
@@ -42,7 +43,7 @@ public class Repl implements NotificationHandler {
                 switch (replState) {
                     case PRELOGIN -> result = preClient.eval(line);
                     case POSTLOGIN -> result = postClient.eval(line, authToken);
-                    case INGAME -> result = gameClient.eval(line, authToken, authToken);
+                    case INGAME -> result = gameClient.eval(line, authToken, username, teamColor);
                 }
 
                 if (result.contains("You logged in as")) {
@@ -63,6 +64,7 @@ public class Repl implements NotificationHandler {
 
                 if (result.contains("You successfully joined the game as team: WHITE")) {
                     username = preClient.getUsername();
+                    teamColor = postClient.getTeamColor();
                     replState = ReplState.INGAME;
                     ChessBoardRenderer.setBoard(board, true);
                     System.out.print(result);
@@ -70,6 +72,7 @@ public class Repl implements NotificationHandler {
                 }
                 if (result.contains("You successfully joined the game as team: BLACK")) {
                     username = preClient.getUsername();
+                    teamColor = postClient.getTeamColor();
                     replState = ReplState.INGAME;
                     ChessBoardRenderer.setBoard(board, false);
                     System.out.print(result);
@@ -77,6 +80,7 @@ public class Repl implements NotificationHandler {
                 }
                 if (result.contains("You are now spectating the game")) {
                     username = preClient.getUsername();
+                    teamColor = postClient.getTeamColor();
                     replState = ReplState.INGAME;
                     ChessBoardRenderer.setBoard(board, true);
                     System.out.print(result);

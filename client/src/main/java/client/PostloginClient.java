@@ -13,6 +13,7 @@ import java.util.Map;
 public class PostloginClient {
     private final ServerFacade server;
     private final Map<Integer, Integer> gameIdMap = new HashMap<>();
+    private String teamColor;
 
     public PostloginClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -54,6 +55,7 @@ public class PostloginClient {
     private String joinGame(String authToken, String... params) throws ResponseException {
         if (params.length >= 2) {
             String teamColor = params[0].toUpperCase();
+            this.teamColor = teamColor;
 
             if (!"WHITE".equals(teamColor) && !"BLACK".equals(teamColor)) {
                 return EscapeSequences.SET_TEXT_COLOR_RED +
@@ -215,5 +217,9 @@ public class PostloginClient {
         return EscapeSequences.SET_TEXT_COLOR_RED +
                 "Error: Unauthorized access." +
                 EscapeSequences.SET_TEXT_COLOR_WHITE;
+    }
+
+    public String getTeamColor() {
+        return teamColor;
     }
 }

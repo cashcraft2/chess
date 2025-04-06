@@ -17,7 +17,7 @@ public class InGameClient {
         this.messageHandler = messageHandler;
     }
 
-    public String eval(String input, String authToken, String username) {
+    public String eval(String input, String authToken, String username, String teamColor) {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
@@ -25,11 +25,11 @@ public class InGameClient {
 
             return switch (cmd) {
                 case "quit" -> "quit";
-                case "redraw" -> redrawBoard(authToken, username);
-                case "leave" -> leaveGame(authToken, username);
-                case "move" -> makeMove(authToken, username);
-                case "resign" -> resign(authToken, username);
-                case "highlight" -> highlightLegalMoves(authToken, username);
+                case "redraw" -> redrawBoard(authToken, username, teamColor);
+                case "leave" -> leaveGame(authToken, username, teamColor);
+                case "move" -> makeMove(authToken, username, teamColor);
+                case "resign" -> resign(authToken, username, teamColor);
+                case "highlight" -> highlightLegalMoves(authToken, username, teamColor);
                 default -> help();
             };
         } catch (Exception ex) {
@@ -37,23 +37,23 @@ public class InGameClient {
         }
     }
 
-    private String redrawBoard(String authToken, String username) {
+    private String redrawBoard(String authToken, String username, String teamColor) {
         return null;
     }
 
-    private String leaveGame(String authToken, String username) {
+    private String leaveGame(String authToken, String username, String teamColor) {
         return null;
     }
 
-    private String makeMove(String authToken, String username) {
+    private String makeMove(String authToken, String username, String teamColor) {
         return null;
     }
 
-    private String resign(String authToken, String username) {
+    private String resign(String authToken, String username, String teamColor) {
         return null;
     }
 
-    private String highlightLegalMoves(String authToken, String username) {
+    private String highlightLegalMoves(String authToken, String username, String teamColor) {
         return null;
     }
 
