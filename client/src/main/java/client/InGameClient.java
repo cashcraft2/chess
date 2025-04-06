@@ -25,11 +25,11 @@ public class InGameClient {
 
             return switch (cmd) {
                 case "quit" -> "quit";
-                case "redraw" -> redrawBoard(authToken, username, teamColor);
-                case "leave" -> leaveGame(authToken, username, teamColor);
-                case "move" -> makeMove(authToken, username, teamColor);
-                case "resign" -> resign(authToken, username, teamColor);
-                case "highlight" -> highlightLegalMoves(authToken, username, teamColor);
+                case "redraw" -> redrawBoard(authToken, username, teamColor, params);
+                case "leave" -> leaveGame(authToken, username, teamColor, params);
+                case "move" -> makeMove(authToken, username, teamColor, params);
+                case "resign" -> resign(authToken, username, teamColor, params);
+                case "highlight" -> highlightLegalMoves(authToken, username, teamColor, params);
                 default -> help();
             };
         } catch (Exception ex) {
@@ -37,23 +37,23 @@ public class InGameClient {
         }
     }
 
-    private String redrawBoard(String authToken, String username, String teamColor) {
+    private String redrawBoard(String authToken, String username, String teamColor, String... params) {
         return null;
     }
 
-    private String leaveGame(String authToken, String username, String teamColor) {
+    private String leaveGame(String authToken, String username, String teamColor, String... params) {
         return null;
     }
 
-    private String makeMove(String authToken, String username, String teamColor) {
+    private String makeMove(String authToken, String username, String teamColor, String...params) {
         return null;
     }
 
-    private String resign(String authToken, String username, String teamColor) {
+    private String resign(String authToken, String username, String teamColor, String...params) {
         return null;
     }
 
-    private String highlightLegalMoves(String authToken, String username, String teamColor) {
+    private String highlightLegalMoves(String authToken, String username, String teamColor, String... params) {
         return null;
     }
 

@@ -56,6 +56,8 @@ public class UserGameCommand {
 
     public String getUsername() {return username;}
 
+    public String getTeamColor() {return teamColor;}
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

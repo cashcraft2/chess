@@ -64,7 +64,8 @@ public class Server {
             return listGamesHandler.listGames(request, response, gameDAO, authDAO);
         });
         Spark.put("/game", (request, response) -> {
-            return joinGameHandler.joinGame(request, response, gameDAO, authDAO);
+            var join = joinGameHandler.joinGame(request, response, gameDAO, authDAO);
+            return join;
         });
     }
 }
