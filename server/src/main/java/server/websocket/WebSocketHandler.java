@@ -5,6 +5,7 @@ import org.eclipse.jetty.util.IO;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import server.Server;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -22,15 +23,22 @@ public class WebSocketHandler {
         String teamColor = command.getTeamColor();
         Integer gameID = command.getGameID();
 
-        switch (command.getCommandType()) {
-            case CONNECT -> connect(authToken, gameID, username, teamColor, session);
-            case MAKE_MOVE -> makeMove(authToken, username, session);
-            case LEAVE -> leave(username);
-            case RESIGN -> resign(username);
+        try {
+            switch (command.getCommandType()) {
+                case CONNECT -> connect(authToken, gameID, username, teamColor, session);
+                case MAKE_MOVE -> makeMove(authToken, username, session);
+                case LEAVE -> leave(username);
+                case RESIGN -> resign(username);
+                default -> sendError(session, "Error: invalid command type.");
+            }
+        }
+        catch (Exception ex) {
+                sendError(session, "Error: " + ex.getMessage());
         }
     }
 
-    private void connect(String authToken, Integer gameID, String username, String teamColor, Session session) throws IOException {
+    private void connect(String authToken, Integer gameID, String username, String teamColor, Session session)
+            throws IOException {
         if(authToken == null) {
             throw new IOException("Error: unauthorized");
         }
@@ -38,15 +46,15 @@ public class WebSocketHandler {
             throw new IOException("Error: no game found");
         }
         if (teamColor == null) {
-            connections.add(username, session);
+            connections.add(gameID, username, session);
             var message = String.format("%s has joined the game as an observer", username);
             var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, message);
-            connections.broadcast(username, notification);
+            connections.broadcast(gameID, username, notification);
         }
-        connections.add(username, session);
+        connections.add(gameID, username, session);
         var message = String.format("%s has joined the game as team: %s", username, teamColor);
         var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, message);
-        connections.broadcast(username, notification);
+        connections.broadcast(gameID, username, notification);
     }
 
     private void makeMove(String authToken, String username, Session session){
@@ -59,5 +67,10 @@ public class WebSocketHandler {
 
     private void resign(String username) {
 
+    }
+
+    private void sendError(Session session, String error) throws IOException {
+        ServerMessage errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, error);
+        session.getRemote().sendString(errorMessage.toString());
     }
 }
