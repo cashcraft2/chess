@@ -8,6 +8,8 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import server.Server;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -50,12 +52,12 @@ public class WebSocketHandler {
         if (teamColor == null) {
             connections.add(gameID, username, session);
             var message = String.format("%s has joined the game as an observer", username);
-            var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, message);
+            var notification = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, message, game);
             connections.broadcast(gameID, username, notification);
         }
         connections.add(gameID, username, session);
         var message = String.format("%s has joined the game as team: %s", username, teamColor);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, message);
+        var notification = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, message, game);
         connections.broadcast(gameID, username, notification);
     }
 
@@ -72,7 +74,7 @@ public class WebSocketHandler {
     }
 
     private void sendError(Session session, String error) throws IOException {
-        ServerMessage errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, error);
+        ServerMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, error);
         session.getRemote().sendString(errorMessage.toString());
     }
 }
