@@ -18,17 +18,11 @@ public class UserGameCommand {
 
     private final Integer gameID;
 
-    private final String username;
 
-    private final String teamColor;
-
-    public UserGameCommand(CommandType commandType, String authToken, Integer gameID,
-                           String username, String teamColor) {
+    public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
         this.commandType = commandType;
         this.authToken = authToken;
         this.gameID = gameID;
-        this.username = username;
-        this.teamColor = teamColor;
     }
 
     public enum CommandType {
@@ -53,10 +47,7 @@ public class UserGameCommand {
     public Integer getGameID() {
         return gameID;
     }
-
-    public String getUsername() {return username;}
-
-    public String getTeamColor() {return teamColor;}
+    
 
     @Override
     public boolean equals(Object o) {

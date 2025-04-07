@@ -6,6 +6,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import server.Server;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -18,9 +19,10 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+        MakeMoveCommand moveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
         String authToken = command.getAuthToken();
-        String username = command.getUsername();
-        String teamColor = command.getTeamColor();
+        String username = moveCommand.getUsername();
+        String teamColor = moveCommand.getTeamColor();
         Integer gameID = command.getGameID();
 
         try {
