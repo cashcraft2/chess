@@ -47,4 +47,27 @@ public class ConnectionManager {
             connections.remove(gameID);
         }
     }
+
+    public void sendToUser(int gameID, String username, ServerMessage message) throws IOException {
+        var newConnections = connections.get(gameID);
+        if (newConnections == null) {
+            return;
+        }
+        var removeList = new ArrayList<Connection>();
+
+        for (var connection : newConnections) {
+            if (connection.username.equals(username)) {
+                if (connection.session.isOpen()) {
+                    connection.send(message.toString());
+                }
+                else {
+                    removeList.add(connection);
+                }
+            }
+        }
+        newConnections.removeAll(removeList);
+        if (newConnections.isEmpty()) {
+            connections.remove(gameID);
+        }
+    }
 }

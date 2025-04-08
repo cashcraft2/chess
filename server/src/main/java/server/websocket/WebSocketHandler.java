@@ -14,6 +14,7 @@ import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -69,9 +70,12 @@ public class WebSocketHandler {
 
         if (teamColor == null) {
             connections.add(gameID, username, session);
-            var message = String.format("%s has joined the game as an observer", username);
-            var notification = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, message, game.game());
+            var note = String.format("%s has joined the game as an spectator", username);
+            var load = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, game.game());
+            var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, note);
+            connections.sendToUser(gameID, username, load);
             connections.broadcast(gameID, username, notification);
+
         }
         else {
             connections.add(gameID, username, session);
@@ -86,7 +90,7 @@ public class WebSocketHandler {
     }
 
     private void leave(){
-        
+
     }
 
     private void resign() {
