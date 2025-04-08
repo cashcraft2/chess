@@ -1,5 +1,9 @@
 package server.websocket;
 
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
@@ -41,9 +45,9 @@ public class WebSocketHandler {
         try {
             switch (command.getCommandType()) {
                 case CONNECT -> connect(authToken, gameID, teamColor, session);
-                case MAKE_MOVE -> makeMove(authToken, session);
-                case LEAVE -> leave();
-                case RESIGN -> resign();
+                case MAKE_MOVE -> makeMove(authToken, gameID, session, moveCommand, teamColor);
+                case LEAVE -> leave(authToken, gameID, session);
+                case RESIGN -> resign(session);
                 default -> sendError(session, "Error: invalid command type.");
             }
         }
@@ -62,10 +66,12 @@ public class WebSocketHandler {
         String token = authData.authToken();
 
         if(token == null) {
-            throw new IOException("Error: unauthorized");
+            String message = "Error: unauthorized";
+            sendError(session, message);
         }
         if (game == null) {
-            throw new IOException("Error: no game found");
+            String message = "Error: no game found";
+            sendError(session, message);
         }
 
         if (teamColor == null) {
@@ -85,15 +91,81 @@ public class WebSocketHandler {
         }
     }
 
-    private void makeMove(String authToken, Session session){
+    private void makeMove(String authToken, Integer gameID, Session session, MakeMoveCommand command, String teamColor)
+            throws DataAccessException, IOException, InvalidMoveException {
+        WebsocketService service = accessDAO(authDAO, gameDAO);
+        AuthData authData = service.getAuthData(authToken);
+        String username = authData.username();
+        GameData game = service.getGame(gameID);
+        ChessMove move = command.getMove();
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
+        ChessGame chessGame = game.game();
 
+        if (game == null) {
+            String message = "Error: The game does not exists";
+            sendError(session, message);
+        }
+
+        if (!chessGame.validMoves(start).contains(move)) {
+            String message = "Error: Invalid move";
+            sendError(session, message);
+        }
+
+        chessGame.makeMove(move);
+
+        service.updateGame(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
+
+        var load = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, chessGame);
+        connections.broadcast(gameID, null, load);
+
+        String note = String.format("% moved from %s to %s", username, start, end);
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, note);
+        connections.broadcast(gameID, username, notification);
+
+        if (chessGame.isInCheckmate(ChessGame.TeamColor.valueOf(teamColor))) {
+            connections.broadcast(gameID, null, 
+                    new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Checkmate!"));
+            service.updateGame(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
+        }
+        else if (chessGame.isInCheck(ChessGame.TeamColor.valueOf(teamColor))) {
+            connections.broadcast(gameID, null,
+                    new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Check!"));
+        }
+        else if (chessGame.isInStalemate(ChessGame.TeamColor.valueOf(teamColor))) {
+            connections.broadcast(gameID, null,
+                    new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Stalemate!"));
+        }
     }
 
-    private void leave(){
+    private void leave(String authToken, Integer gameID, Session session) throws DataAccessException, IOException {
+        WebsocketService service = accessDAO(authDAO, gameDAO);
+        AuthData authData = service.getAuthData(authToken);
+        String username = authData.username();
+        GameData game = service.getGame(gameID);
 
+        if (game == null) {
+            String message = "Error: The game does not exists";
+            sendError(session, message);
+        }
+        ChessGame chessGame = game.game();
+
+        if (username.equals(game.whiteUsername())) {
+             game = new GameData(gameID, null, game.blackUsername(), game.gameName(), chessGame);
+        } else if (username.equals(game.blackUsername())) {
+            game = new GameData(gameID, game.whiteUsername(), null, game.gameName(), chessGame);
+        }
+        service.updateGame(gameID, game.whiteUsername(), game.blackUsername(),
+                game.gameName(), chessGame);
+
+        connections.remove(gameID, username);
+
+        var note = String.format("%s has left the game.", username);
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, note);
+        connections.broadcast(gameID, username, notification);
     }
 
-    private void resign() {
+    private void resign(Session session) {
 
     }
 
