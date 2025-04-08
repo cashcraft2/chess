@@ -13,13 +13,13 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-        WebSocketHandler webSocketHandler = new WebSocketHandler();
         MySqlUserDAO userDAO = new MySqlUserDAO();
         MySqlAuthDAO authDAO = new MySqlAuthDAO();
         MySqlGameDAO gameDAO = new MySqlGameDAO();
 
 
-        createRoutes(userDAO, authDAO, gameDAO, webSocketHandler);
+        createRoutes(userDAO, authDAO, gameDAO);
+        createWebSocket(authDAO, gameDAO);
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
 
@@ -32,8 +32,7 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private static void createRoutes(MySqlUserDAO userDAO, MySqlAuthDAO authDAO, MySqlGameDAO gameDAO,
-                                     WebSocketHandler webSocketHandler){
+    private static void createRoutes(MySqlUserDAO userDAO, MySqlAuthDAO authDAO, MySqlGameDAO gameDAO){
         ClearHandler clearHandler = new ClearHandler();
         RegisterHandler registerHandler = new RegisterHandler();
         LoginHandler loginHandler = new LoginHandler();
@@ -41,8 +40,6 @@ public class Server {
         ListGamesHandler listGamesHandler = new ListGamesHandler();
         CreateGameHandler createGameHandler = new CreateGameHandler();
         JoinGameHandler joinGameHandler = new JoinGameHandler();
-
-        Spark.webSocket("/ws", webSocketHandler);
 
         Spark.delete("/db", (request, response) -> {
             // Call the ClearHandler class and pass it the request and response. Use the common json to java object class to do the conversion
@@ -64,8 +61,13 @@ public class Server {
             return listGamesHandler.listGames(request, response, gameDAO, authDAO);
         });
         Spark.put("/game", (request, response) -> {
-            var join = joinGameHandler.joinGame(request, response, gameDAO, authDAO);
-            return join;
+            return joinGameHandler.joinGame(request, response, gameDAO, authDAO);
+
         });
+    }
+
+    private static void createWebSocket(MySqlAuthDAO authDAO, MySqlGameDAO gameDAO) {
+        WebSocketHandler webSocketHandler = new WebSocketHandler(gameDAO, authDAO);
+        Spark.webSocket("/ws", webSocketHandler);
     }
 }
