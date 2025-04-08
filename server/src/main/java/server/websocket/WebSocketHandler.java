@@ -47,7 +47,7 @@ public class WebSocketHandler {
                 case CONNECT -> connect(authToken, gameID, teamColor, session);
                 case MAKE_MOVE -> makeMove(authToken, gameID, session, moveCommand, teamColor);
                 case LEAVE -> leave(authToken, gameID, session);
-                case RESIGN -> resign(session);
+                case RESIGN -> resign(gameID, authToken, session);
                 default -> sendError(session, "Error: invalid command type.");
             }
         }
@@ -102,6 +102,10 @@ public class WebSocketHandler {
         ChessPosition end = move.getEndPosition();
         ChessGame chessGame = game.game();
 
+        if (chessGame.isGameOver()) {
+            throw new IOException("Error: The game is over. No more moves can be made.");
+        }
+
         if (game == null) {
             String message = "Error: The game does not exists";
             sendError(session, message);
@@ -113,6 +117,7 @@ public class WebSocketHandler {
         }
 
         chessGame.makeMove(move);
+        chessGame.determineGame(ChessGame.TeamColor.valueOf(teamColor));
 
         service.updateGame(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
 
@@ -165,8 +170,23 @@ public class WebSocketHandler {
         connections.broadcast(gameID, username, notification);
     }
 
-    private void resign(Session session) {
+    private void resign(Integer gameID, String authToken, Session session) throws DataAccessException, IOException {
+        WebsocketService service = accessDAO(authDAO, gameDAO);
+        AuthData authData = service.getAuthData(authToken);
+        String username = authData.username();
+        GameData game = service.getGame(gameID);
 
+        if (game == null) {
+            return;
+        }
+
+        ChessGame chessGame = game.game();
+        chessGame.resign();
+
+        service.updateGame(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
+        String note = String.format("%s has resigned from the game. The game is over!", username);
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, note);
+        connections.broadcast(gameID, null, notification);
     }
 
     private void sendError(Session session, String error) throws IOException {

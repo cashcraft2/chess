@@ -12,11 +12,31 @@ import java.util.Collection;
 public class ChessGame {
     private TeamColor currentTurn;
     private ChessBoard board;
+    private boolean gameOver = false;
 
     public ChessGame() {
         this.board = new ChessBoard();
         this.board.resetBoard();
         this.currentTurn = TeamColor.WHITE;
+    }
+
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean isOver) {
+        this.gameOver = isOver;
+    }
+
+    public void resign() {
+        this.gameOver = true;
+    }
+
+    public void determineGame(TeamColor teamColor) {
+        if (isInCheckmate(teamColor) || isInStalemate(teamColor)) {
+            this.gameOver = true;
+        }
     }
 
     /**
