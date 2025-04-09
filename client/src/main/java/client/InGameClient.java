@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessBoard;
 import chess.ChessMove;
 import chess.ChessPosition;
 import exception.ResponseException;
@@ -21,11 +22,10 @@ public class InGameClient {
         this.serverUrl = serverUrl;
         this.notificationHandler = notificationHandler;
         this.ws = new WebSocketFacade(serverUrl, notificationHandler);
-
-
     }
 
-    public String eval(String input, String authToken, String username, String teamColor, Integer gameID) {
+    public String eval(String input, String authToken, String username, String teamColor,
+                       Integer gameID, ChessBoard board) {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
