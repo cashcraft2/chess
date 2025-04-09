@@ -17,6 +17,8 @@ public class InGameClient {
     private final String serverUrl;
     private final NotificationHandler notificationHandler;
     private final WebSocketFacade ws;
+    private ChessBoard board;
+    private boolean isWhite;
 
     public InGameClient(String serverUrl, NotificationHandler notificationHandler) throws ResponseException {
         server = new ServerFacade(serverUrl);
@@ -48,7 +50,14 @@ public class InGameClient {
 
     private String redrawBoard(String authToken, String username, String teamColor,
                                ChessBoard board, boolean isWhite, String... params) {
-        return null;
+        try {
+            ChessBoardRenderer.setBoard(board, isWhite);
+            return "";
+        } catch (Exception ex) {
+            return EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Error drawing board: " + ex.getMessage() +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        }
     }
 
     private String leaveGame(String authToken, String username, String teamColor, Integer gameID, String... params) {
@@ -118,6 +127,10 @@ public class InGameClient {
         }
 
         return new ChessPosition(row, col);
+    }
+
+    public void updateBoard(ChessBoard board) {
+        this.board = board;
     }
 
 

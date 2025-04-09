@@ -106,10 +106,8 @@ public class Repl implements NotificationHandler {
         else if (message instanceof LoadGameMessage loadGameMessage) {
             ChessGame chessGame = loadGameMessage.getGame();
             if (chessGame != null) {
-                ChessBoard board = chessGame.getBoard();
-                if(teamColor.equalsIgnoreCase("WHITE") || teamColor == null) {
-                    this.isWhite = true;
-                }
+                this.board = chessGame.getBoard();
+                this.isWhite = teamColor == null || teamColor.equalsIgnoreCase("WHITE");
                 ChessBoardRenderer.setBoard(board, isWhite);
             }
         }

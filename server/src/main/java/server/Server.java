@@ -17,9 +17,8 @@ public class Server {
         MySqlAuthDAO authDAO = new MySqlAuthDAO();
         MySqlGameDAO gameDAO = new MySqlGameDAO();
 
-
-        createRoutes(userDAO, authDAO, gameDAO);
         createWebSocket(authDAO, gameDAO);
+        createRoutes(userDAO, authDAO, gameDAO);
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
 
