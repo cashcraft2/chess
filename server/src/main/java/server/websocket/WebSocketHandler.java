@@ -44,7 +44,7 @@ public class WebSocketHandler {
 
         try {
             switch (command.getCommandType()) {
-                case CONNECT -> connect(authToken, gameID, teamColor, session);
+                case CONNECT -> connect(authToken, gameID, session, teamColor);
                 case MAKE_MOVE -> makeMove(authToken, gameID, session, moveCommand, teamColor);
                 case LEAVE -> leave(authToken, gameID, session);
                 case RESIGN -> resign(gameID, authToken, session);
@@ -56,19 +56,20 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(String authToken, Integer gameID, String teamColor, Session session)
+    private void connect(String authToken, Integer gameID, Session session, String teamColor)
             throws IOException, DataAccessException {
 
         WebsocketService service = accessDAO(authDAO, gameDAO);
         GameData game = service.getGame(gameID);
         AuthData authData = service.getAuthData(authToken);
-        String username = authData.username();
-        String token = authData.authToken();
 
         if (authData == null || authData.username() == null) {
-            sendError(session, "Error: Name is null");
+            sendError(session, "Error: unauthorized - invalid or expired token");
             return;
         }
+
+        String username = authData.username();
+        String token = authData.authToken();
 
         if(token == null) {
             String message = "Error: unauthorized";
@@ -109,6 +110,24 @@ public class WebSocketHandler {
         AuthData authData = service.getAuthData(authToken);
         String username = authData.username();
         GameData game = service.getGame(gameID);
+
+        if (game == null) {
+            String message = "Error: The game does not exists";
+            sendError(session, message);
+            return;
+        }
+
+        if (!username.equals(game.whiteUsername()) && !username.equals(game.blackUsername())) {
+            sendError(session, "Error: Spectators cannot make moves.");
+            return;
+        }
+        ChessGame.TeamColor currentTurn = game.game().getTeamTurn();
+        if ((currentTurn == ChessGame.TeamColor.WHITE && !username.equals(game.whiteUsername())) ||
+                (currentTurn == ChessGame.TeamColor.BLACK && !username.equals(game.blackUsername()))) {
+            sendError(session, "Error: It is not your turn.");
+            return;
+        }
+
         ChessMove move = command.getMove();
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
@@ -120,12 +139,6 @@ public class WebSocketHandler {
             return;
         }
 
-        if (game == null) {
-            String message = "Error: The game does not exists";
-            sendError(session, message);
-            return;
-        }
-
         if (!chessGame.validMoves(start).contains(move)) {
             String message = "Error: Invalid move";
             sendError(session, message);
@@ -133,27 +146,27 @@ public class WebSocketHandler {
         }
 
         chessGame.makeMove(move);
-        chessGame.determineGame(ChessGame.TeamColor.valueOf(teamColor));
+        chessGame.determineGame(chessGame.getTeamTurn());
 
         service.updateGame(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
 
         var load = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, chessGame);
         connections.broadcast(gameID, null, load);
 
-        String note = String.format("% moved from %s to %s", username, start, end);
+        String note = username + " moved from " + start + " to " + end;
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, note);
         connections.broadcast(gameID, username, notification);
 
-        if (chessGame.isInCheckmate(ChessGame.TeamColor.valueOf(teamColor))) {
+        if (chessGame.isInCheckmate(chessGame.getTeamTurn())) {
             connections.broadcast(gameID, null, 
                     new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Checkmate!"));
             service.updateGame(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
         }
-        else if (chessGame.isInCheck(ChessGame.TeamColor.valueOf(teamColor))) {
+        else if (chessGame.isInCheck(chessGame.getTeamTurn())) {
             connections.broadcast(gameID, null,
                     new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Check!"));
         }
-        else if (chessGame.isInStalemate(ChessGame.TeamColor.valueOf(teamColor))) {
+        else if (chessGame.isInStalemate(chessGame.getTeamTurn())) {
             connections.broadcast(gameID, null,
                     new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Stalemate!"));
         }
