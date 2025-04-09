@@ -5,6 +5,7 @@ import chess.ChessMove;
 import chess.ChessPosition;
 import exception.ResponseException;
 import server.ServerFacade;
+import ui.ChessBoardRenderer;
 import ui.EscapeSequences;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
@@ -25,7 +26,7 @@ public class InGameClient {
     }
 
     public String eval(String input, String authToken, String username, String teamColor,
-                       Integer gameID, ChessBoard board) {
+                       Integer gameID, ChessBoard board, boolean isWhite) {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
@@ -33,11 +34,11 @@ public class InGameClient {
 
             return switch (cmd) {
                 case "quit" -> "quit";
-                case "redraw" -> redrawBoard(authToken, username, teamColor, params);
+                case "redraw" -> redrawBoard(authToken, username, teamColor, board, isWhite, params);
                 case "leave" -> leaveGame(authToken, username, teamColor, gameID, params);
                 case "move" -> makeMove(authToken, username, teamColor, gameID, params);
                 case "resign" -> resign(authToken, username, teamColor, gameID, params);
-                case "highlight" -> highlightLegalMoves(authToken, username, teamColor, params);
+                case "highlight" -> highlightLegalMoves(authToken, username, teamColor, board, isWhite, params);
                 default -> help();
             };
         } catch (Exception ex) {
@@ -45,7 +46,8 @@ public class InGameClient {
         }
     }
 
-    private String redrawBoard(String authToken, String username, String teamColor, String... params) {
+    private String redrawBoard(String authToken, String username, String teamColor,
+                               ChessBoard board, boolean isWhite, String... params) {
         return null;
     }
 
@@ -97,7 +99,8 @@ public class InGameClient {
         }
     }
 
-    private String highlightLegalMoves(String authToken, String username, String teamColor, String... params) {
+    private String highlightLegalMoves(String authToken, String username, String teamColor,
+                                       ChessBoard board, boolean isWhite, String... params) {
         return null;
     }
 

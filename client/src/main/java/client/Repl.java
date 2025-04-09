@@ -22,6 +22,7 @@ public class Repl implements NotificationHandler {
     private String teamColor = null;
     private Integer gameID = null;
     private ChessBoard board = null;
+    private boolean isWhite = false;
 
     public Repl(String serverUrl) {
         preClient = new PreloginClient(serverUrl);
@@ -52,7 +53,8 @@ public class Repl implements NotificationHandler {
                 switch (replState) {
                     case PRELOGIN -> result = preClient.eval(line);
                     case POSTLOGIN -> result = postClient.eval(line, authToken);
-                    case INGAME -> result = gameClient.eval(line, authToken, username, teamColor, gameID, board);
+                    case INGAME -> result = gameClient.eval(line, authToken, username,
+                                    teamColor, gameID, board, isWhite);
                 }
                 transitionRepl(result);
                 System.out.print(result);
@@ -105,7 +107,9 @@ public class Repl implements NotificationHandler {
             ChessGame chessGame = loadGameMessage.getGame();
             if (chessGame != null) {
                 ChessBoard board = chessGame.getBoard();
-                boolean isWhite = teamColor == null || teamColor.equalsIgnoreCase("WHITE");
+                if(teamColor.equalsIgnoreCase("WHITE") || teamColor == null) {
+                    this.isWhite = true;
+                }
                 ChessBoardRenderer.setBoard(board, isWhite);
             }
         }
