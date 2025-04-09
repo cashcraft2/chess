@@ -65,6 +65,11 @@ public class WebSocketHandler {
         String username = authData.username();
         String token = authData.authToken();
 
+        if (authData == null || authData.username() == null) {
+            sendError(session, "Error: Name is null");
+            return;
+        }
+
         if(token == null) {
             String message = "Error: unauthorized";
             sendError(session, message);
@@ -110,7 +115,9 @@ public class WebSocketHandler {
         ChessGame chessGame = game.game();
 
         if (chessGame.isGameOver()) {
-            throw new IOException("Error: The game is over. No more moves can be made.");
+            String message = "Cannot make any moves. The game is over!";
+            sendError(session, message);
+            return;
         }
 
         if (game == null) {
@@ -122,6 +129,7 @@ public class WebSocketHandler {
         if (!chessGame.validMoves(start).contains(move)) {
             String message = "Error: Invalid move";
             sendError(session, message);
+            return;
         }
 
         chessGame.makeMove(move);
@@ -160,6 +168,7 @@ public class WebSocketHandler {
         if (game == null) {
             String message = "Error: The game does not exists";
             sendError(session, message);
+            return;
         }
         ChessGame chessGame = game.game();
 
@@ -191,9 +200,22 @@ public class WebSocketHandler {
         }
 
         ChessGame chessGame = game.game();
-        chessGame.resign();
 
+        boolean isWhite = username.equals(game.whiteUsername());
+        boolean isBlack = username.equals(game.blackUsername());
+        if (!isWhite && !isBlack) {
+            sendError(session, "Error: Only players can resign from a game.");
+            return;
+        }
+
+        if (chessGame.isGameOver()) {
+            sendError(session, "Error: The game is already over.");
+            return;
+        }
+
+        chessGame.resign();
         service.updateGame(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
+
         String note = String.format("%s has resigned from the game. The game is over!", username);
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, note);
         connections.broadcast(gameID, null, notification);
