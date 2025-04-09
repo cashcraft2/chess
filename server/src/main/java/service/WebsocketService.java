@@ -20,7 +20,8 @@ public class WebsocketService {
         return gameDAO.getGameWithID(gameID);
     }
 
-    public void updateGame(Integer gameID, String white, String black, String gameName, ChessGame game) throws DataAccessException {
+    public void updateGame(Integer gameID, String white, String black, String gameName, ChessGame game)
+            throws DataAccessException {
         gameDAO.updateGame(gameID, white, black, gameName, game);
     }
 

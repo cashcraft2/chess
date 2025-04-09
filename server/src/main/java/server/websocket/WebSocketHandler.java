@@ -68,10 +68,17 @@ public class WebSocketHandler {
         if(token == null) {
             String message = "Error: unauthorized";
             sendError(session, message);
+            return;
         }
         if (game == null) {
             String message = "Error: no game found";
             sendError(session, message);
+            return;
+        }
+        if (game.game() == null) {
+            String message = "Error: game is null inside GameData";
+            sendError(session, message);
+            return;
         }
 
         if (teamColor == null) {
