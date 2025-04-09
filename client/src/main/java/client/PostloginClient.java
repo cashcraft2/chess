@@ -14,6 +14,7 @@ public class PostloginClient {
     private final ServerFacade server;
     private final Map<Integer, Integer> gameIdMap = new HashMap<>();
     private String teamColor;
+    private int gameID;
 
     public PostloginClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -85,6 +86,8 @@ public class PostloginClient {
 
             int actualGameId = gameIdMap.get(selectedGame);
 
+            this.gameID = actualGameId;
+
             Collection<GameData> games = server.listGames(authToken);
 
             GameData chosenGame = games.stream()
@@ -143,6 +146,8 @@ public class PostloginClient {
         }
 
         int actualGameId = gameIdMap.get(selectedGames);
+        this.gameID = actualGameId;
+
         Collection<GameData> games = server.listGames(authToken);
 
         GameData chosenGame = games.stream()
@@ -222,4 +227,6 @@ public class PostloginClient {
     public String getTeamColor() {
         return teamColor;
     }
+
+    public Integer getGameId(){return gameID;}
 }

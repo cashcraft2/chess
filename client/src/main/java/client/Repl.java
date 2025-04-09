@@ -2,6 +2,7 @@ package client;
 
 import java.util.Scanner;
 import chess.ChessBoard;
+import exception.ResponseException;
 import ui.ChessBoardRenderer;
 import ui.EscapeSequences;
 import websocket.messages.ServerMessage;
@@ -10,17 +11,23 @@ import websocket.NotificationHandler;
 public class Repl implements NotificationHandler {
     private final PreloginClient preClient;
     private final PostloginClient postClient;
-    private final InGameClient gameClient;
+    private InGameClient gameClient;
     private ReplState replState;
     private String authToken = null;
     private final ChessBoard board;
     private String username = null;
     private String teamColor = null;
+    private Integer gameID = null;
 
     public Repl(String serverUrl) {
         preClient = new PreloginClient(serverUrl);
         postClient = new PostloginClient(serverUrl);
-        gameClient = new InGameClient(serverUrl, this);
+        try{
+            gameClient = new InGameClient(serverUrl, this);
+        } catch (ResponseException ex) {
+            System.out.println("Error: " + ex.getMessage());
+        }
+
         replState = ReplState.PRELOGIN;
         board = new ChessBoard();
         board.resetBoard();
@@ -43,7 +50,7 @@ public class Repl implements NotificationHandler {
                 switch (replState) {
                     case PRELOGIN -> result = preClient.eval(line);
                     case POSTLOGIN -> result = postClient.eval(line, authToken);
-                    case INGAME -> result = gameClient.eval(line, authToken, username, teamColor);
+                    case INGAME -> result = gameClient.eval(line, authToken, username, teamColor, gameID);
                 }
 
                 if (result.contains("You logged in as")) {
@@ -65,6 +72,7 @@ public class Repl implements NotificationHandler {
                 if (result.contains("You successfully joined the game as team: WHITE")) {
                     username = preClient.getUsername();
                     teamColor = postClient.getTeamColor();
+                    gameID = postClient.getGameId();
                     replState = ReplState.INGAME;
                     ChessBoardRenderer.setBoard(board, true);
                     System.out.print(result);
@@ -73,6 +81,7 @@ public class Repl implements NotificationHandler {
                 if (result.contains("You successfully joined the game as team: BLACK")) {
                     username = preClient.getUsername();
                     teamColor = postClient.getTeamColor();
+                    gameID = postClient.getGameId();
                     replState = ReplState.INGAME;
                     ChessBoardRenderer.setBoard(board, false);
                     System.out.print(result);
@@ -81,6 +90,7 @@ public class Repl implements NotificationHandler {
                 if (result.contains("You are now spectating the game")) {
                     username = preClient.getUsername();
                     teamColor = postClient.getTeamColor();
+                    gameID = postClient.getGameId();
                     replState = ReplState.INGAME;
                     ChessBoardRenderer.setBoard(board, true);
                     System.out.print(result);

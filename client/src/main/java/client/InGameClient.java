@@ -1,23 +1,31 @@
 package client;
 
+import chess.ChessMove;
+import chess.ChessPosition;
+import exception.ResponseException;
 import server.ServerFacade;
 import ui.EscapeSequences;
 import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
 
 import java.util.Arrays;
 
 public class InGameClient {
     private final ServerFacade server;
     private final String serverUrl;
-    private final NotificationHandler messageHandler;
+    private final NotificationHandler notificationHandler;
+    private final WebSocketFacade ws;
 
-    public InGameClient(String serverUrl, NotificationHandler messageHandler) {
+    public InGameClient(String serverUrl, NotificationHandler notificationHandler) throws ResponseException {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
-        this.messageHandler = messageHandler;
+        this.notificationHandler = notificationHandler;
+        this.ws = new WebSocketFacade(serverUrl, notificationHandler);
+
+
     }
 
-    public String eval(String input, String authToken, String username, String teamColor) {
+    public String eval(String input, String authToken, String username, String teamColor, Integer gameID) {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
@@ -26,9 +34,9 @@ public class InGameClient {
             return switch (cmd) {
                 case "quit" -> "quit";
                 case "redraw" -> redrawBoard(authToken, username, teamColor, params);
-                case "leave" -> leaveGame(authToken, username, teamColor, params);
-                case "move" -> makeMove(authToken, username, teamColor, params);
-                case "resign" -> resign(authToken, username, teamColor, params);
+                case "leave" -> leaveGame(authToken, username, teamColor, gameID, params);
+                case "move" -> makeMove(authToken, username, teamColor, gameID, params);
+                case "resign" -> resign(authToken, username, teamColor, gameID, params);
                 case "highlight" -> highlightLegalMoves(authToken, username, teamColor, params);
                 default -> help();
             };
@@ -41,21 +49,74 @@ public class InGameClient {
         return null;
     }
 
-    private String leaveGame(String authToken, String username, String teamColor, String... params) {
-        return null;
+    private String leaveGame(String authToken, String username, String teamColor, Integer gameID, String... params) {
+        try {
+            ws.leaveGame(authToken, gameID, username, teamColor);
+            return EscapeSequences.SET_TEXT_COLOR_BLUE +
+                    "You left the game." +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        } catch (Exception ex) {
+            return EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Error: " + ex.getMessage() +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        }
     }
 
-    private String makeMove(String authToken, String username, String teamColor, String...params) {
-        return null;
+    private String makeMove(String authToken, String username, String teamColor, Integer gameID, String...params) {
+        try {
+            if (params.length < 2) {
+                return EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Error: move <start> <end>" +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE;
+            }
+            ChessPosition start = createPosition(params[0]);
+            ChessPosition end = createPosition(params[1]);
+
+            ChessMove move = new ChessMove(start, end, null);
+            ws.makeMove(authToken, gameID, move, username, teamColor);
+            return EscapeSequences.SET_TEXT_COLOR_BLUE +
+                    "Move sent!" +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        } catch (Exception ex) {
+            return EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Error: " + ex.getMessage() +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        }
     }
 
-    private String resign(String authToken, String username, String teamColor, String...params) {
-        return null;
+    private String resign(String authToken, String username, String teamColor, Integer gameID, String...params) {
+        try {
+            ws.resignGame(authToken, gameID, username, teamColor);
+            return EscapeSequences.SET_TEXT_COLOR_BLUE +
+                    "You resigned from the game." +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        } catch (Exception ex) {
+            return EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Error: " + ex.getMessage() +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        }
     }
 
     private String highlightLegalMoves(String authToken, String username, String teamColor, String... params) {
         return null;
     }
+
+    private ChessPosition createPosition(String pos) throws IllegalArgumentException {
+        if (pos.length() != 2) throw new IllegalArgumentException("Invalid position: " + pos);
+
+        char colChar = pos.charAt(0);
+        char rowChar = pos.charAt(1);
+
+        int col = colChar - 'a' + 1;
+        int row = Character.getNumericValue(rowChar);
+
+        if (col < 1 || col > 8 || row < 1 || row > 8) {
+            throw new IllegalArgumentException("Position out of bounds: " + pos);
+        }
+
+        return new ChessPosition(row, col);
+    }
+
 
     private String help() {
         return EscapeSequences.SET_TEXT_ITALIC + EscapeSequences.SET_TEXT_COLOR_WHITE + """

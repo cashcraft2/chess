@@ -109,6 +109,7 @@ public class WebSocketHandler {
         if (game == null) {
             String message = "Error: The game does not exists";
             sendError(session, message);
+            return;
         }
 
         if (!chessGame.validMoves(start).contains(move)) {
@@ -177,6 +178,8 @@ public class WebSocketHandler {
         GameData game = service.getGame(gameID);
 
         if (game == null) {
+            String message = "Error: The game does not exists";
+            sendError(session, message);
             return;
         }
 
