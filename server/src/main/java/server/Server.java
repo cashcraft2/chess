@@ -4,7 +4,6 @@ import handler.*;
 import server.websocket.WebSocketHandler;
 import spark.*;
 
-import javax.websocket.WebSocketContainer;
 
 public class Server {
 

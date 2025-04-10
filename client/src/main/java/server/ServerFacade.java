@@ -5,6 +5,8 @@ import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import websocket.WebSocketFacade;
+
 import java.io.*;
 import java.net.*;
 import java.util.Collection;
@@ -56,6 +58,7 @@ public class ServerFacade {
         record JoinRequest(String playerColor, int gameID){}
         var request = new JoinRequest(team, gameID);
         this.makeRequest("PUT", path, request, null, authToken);
+
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken)

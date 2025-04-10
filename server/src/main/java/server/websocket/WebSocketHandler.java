@@ -15,7 +15,6 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.WebsocketService;
 import websocket.commands.MakeMoveCommand;
-import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -36,14 +35,13 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
-        UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
         MakeMoveCommand moveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
-        String authToken = command.getAuthToken();
+        String authToken = moveCommand.getAuthToken();
         String teamColor = moveCommand.getTeamColor();
-        Integer gameID = command.getGameID();
+        Integer gameID = moveCommand.getGameID();
 
         try {
-            switch (command.getCommandType()) {
+            switch (moveCommand.getCommandType()) {
                 case CONNECT -> connect(authToken, gameID, session, teamColor);
                 case MAKE_MOVE -> makeMove(authToken, gameID, session, moveCommand, teamColor);
                 case LEAVE -> leave(authToken, gameID, session);
@@ -99,8 +97,10 @@ public class WebSocketHandler {
         else {
             connections.add(gameID, username, session);
             var message = String.format("%s has joined the game as team: %s", username, teamColor);
-            var notification = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, message, game.game());
-            connections.broadcast(gameID, username, notification);
+            var notification = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, game.game());
+            connections.sendToUser(gameID, username, notification);
+            var note = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+            connections.broadcast(gameID, username, note);
         }
     }
 

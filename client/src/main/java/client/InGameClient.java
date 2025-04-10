@@ -20,15 +20,22 @@ public class InGameClient {
     private ChessBoard board;
     private boolean isWhite;
 
-    public InGameClient(String serverUrl, NotificationHandler notificationHandler) throws ResponseException {
+    public InGameClient(String serverUrl, WebSocketFacade ws, NotificationHandler notificationHandler) throws ResponseException {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         this.notificationHandler = notificationHandler;
-        this.ws = new WebSocketFacade(serverUrl, notificationHandler);
+        this.ws = ws;
     }
 
     public String eval(String input, String authToken, String username, String teamColor,
                        Integer gameID, ChessBoard board, boolean isWhite) {
+
+        try{
+            ws.connectToGame(authToken, gameID, username, teamColor);
+        } catch (Exception ex) {
+            System.out.println("Error: " + ex.getMessage());
+        }
+
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
