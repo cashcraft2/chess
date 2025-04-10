@@ -106,10 +106,14 @@ public class WebSocketFacade extends Endpoint {
             var command = new MakeMoveCommand
                     (UserGameCommand.CommandType.RESIGN, authToken, gameID, null, teamColor);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
-            this.session.close();
+            //this.session.close();
         }
         catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
+    }
+
+    public void quit() throws IOException {
+        this.session.close();
     }
 }

@@ -27,7 +27,7 @@ public class PostloginClient {
         this.ws = ws;
     }
 
-    public String eval(String input, String username, String authToken) {
+    public String eval(String input, String username, String authToken, ChessGame game) {
 
         try {
             var tokens = input.toLowerCase().split(" ");
@@ -38,8 +38,8 @@ public class PostloginClient {
                 case "logout" -> logout(authToken);
                 case "list" -> listGames(authToken);
                 case "create" -> createGame(authToken, params);
-                case "join" -> joinGame(authToken, username, params);
-                case "spectate" -> spectateGame( authToken, params);
+                case "join" -> joinGame(authToken, username, game, params);
+                case "spectate" -> spectateGame( authToken, username, game, params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -61,7 +61,8 @@ public class PostloginClient {
                 """ + EscapeSequences.RESET_TEXT_ITALIC;
     }
 
-    private String joinGame(String authToken, String username, String... params) throws ResponseException {
+    private String joinGame(String authToken, String username, ChessGame chessGame, String... params)
+            throws ResponseException {
         if (params.length >= 2) {
             String teamColor = params[0].toUpperCase();
             this.teamColor = teamColor;
@@ -136,7 +137,7 @@ public class PostloginClient {
                 EscapeSequences.SET_TEXT_COLOR_WHITE;
     }
 
-    private String spectateGame(String authToken, String...params) throws ResponseException {
+    private String spectateGame(String authToken, String username, ChessGame chessGame, String...params) throws ResponseException {
         if (params.length < 1) {
             return EscapeSequences.SET_TEXT_COLOR_RED +
                     "Error: Invalid input. Expected: <game ID>" +
@@ -169,6 +170,12 @@ public class PostloginClient {
                 .filter(game -> game.gameID() == actualGameId)
                 .findFirst()
                 .orElse(null);
+
+        try{
+            ws.connectToGame(authToken, gameID, username, teamColor);
+        } catch (Exception ex) {
+            System.out.println("Error: " + ex.getMessage());
+        }
 
         if (chosenGame == null) {
             return EscapeSequences.SET_TEXT_COLOR_RED +

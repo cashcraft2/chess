@@ -1,6 +1,7 @@
 package client;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import exception.ResponseException;
@@ -11,6 +12,9 @@ import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class InGameClient {
     private final ServerFacade server;
@@ -28,23 +32,36 @@ public class InGameClient {
     }
 
     public String eval(String input, String authToken, String username, String teamColor,
-                       Integer gameID, ChessBoard board, boolean isWhite) {
+                       Integer gameID, ChessBoard board, boolean isWhite, ChessGame game, boolean spect) {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
             return switch (cmd) {
-                case "quit" -> "quit";
+                case "quit" -> quitAll();
                 case "redraw" -> redrawBoard(authToken, username, teamColor, board, isWhite, params);
                 case "leave" -> leaveGame(authToken, username, teamColor, gameID, params);
                 case "move" -> makeMove(authToken, username, teamColor, gameID, params);
-                case "resign" -> resign(authToken, username, teamColor, gameID, params);
-                case "highlight" -> highlightLegalMoves(authToken, username, teamColor, board, isWhite, params);
+                case "resign" -> resign(authToken, username, teamColor, gameID, spect, params);
+                case "highlight" -> highlightLegalMoves(authToken, username, teamColor, game, board, isWhite, params);
                 default -> help();
             };
         } catch (Exception ex) {
             return ex.getMessage();
+        }
+    }
+
+    private String quitAll() {
+        try {
+            ws.quit();
+            return EscapeSequences.SET_TEXT_COLOR_BLUE +
+                    "You have closed your session. Please reload the application." +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        } catch (Exception ex) {
+            return EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Error: " + ex.getMessage() +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
         }
     }
 
@@ -95,7 +112,13 @@ public class InGameClient {
         }
     }
 
-    private String resign(String authToken, String username, String teamColor, Integer gameID, String...params) {
+    private String resign(String authToken, String username,
+                          String teamColor, Integer gameID, boolean spect, String...params) {
+        if (spect){
+            return EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Error: Spectators cannot resign from a game." +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        }
         try {
             ws.resignGame(authToken, gameID, username, teamColor);
             return EscapeSequences.SET_TEXT_COLOR_BLUE +
@@ -108,9 +131,37 @@ public class InGameClient {
         }
     }
 
-    private String highlightLegalMoves(String authToken, String username, String teamColor,
+    private String highlightLegalMoves(String authToken, String username, String teamColor, ChessGame game,
                                        ChessBoard board, boolean isWhite, String... params) {
-        return null;
+        try {
+            if (params.length < 1) {
+                return EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Usage: highlight <position>" +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE;
+            }
+            ChessPosition start = createPosition(params[0]);
+
+            Collection<ChessMove> legalMoves = game.validMoves(start);
+
+            if (legalMoves == null || legalMoves.isEmpty()) {
+                return EscapeSequences.SET_TEXT_COLOR_YELLOW +
+                        "No legal moves from " + params[0] +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE;
+            }
+            Set<ChessPosition> highlights = legalMoves.stream()
+                    .map(ChessMove::getEndPosition).collect(Collectors.toSet());
+
+            highlights.add(start);
+
+            ChessBoardRenderer.setBoardWithHighlights(game.getBoard(), isWhite, highlights);
+            return EscapeSequences.SET_TEXT_COLOR_BLUE +
+                    "Legal moves from " + params[0] + " highlighted." +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        } catch (Exception ex) {
+            return EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Error: " + ex.getMessage() +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        }
     }
 
     private ChessPosition createPosition(String pos) throws IllegalArgumentException {

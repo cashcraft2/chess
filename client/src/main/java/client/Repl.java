@@ -25,6 +25,8 @@ public class Repl implements NotificationHandler {
     private ChessBoard board;
     private boolean isWhite = false;
     private WebSocketFacade ws = null;
+    private ChessGame game;
+    private boolean spect = false;
 
     public Repl(String serverUrl) {
         preClient = new PreloginClient(serverUrl);
@@ -55,9 +57,9 @@ public class Repl implements NotificationHandler {
             try {
                 switch (replState) {
                     case PRELOGIN -> result = preClient.eval(line);
-                    case POSTLOGIN -> result = postClient.eval(line, username, authToken);
+                    case POSTLOGIN -> result = postClient.eval(line, username, authToken, game);
                     case INGAME -> result = gameClient.eval(line, authToken, username,
-                                    teamColor, gameID, board, isWhite);
+                                    teamColor, gameID, board, isWhite, game, spect);
                 }
                 transitionRepl(result);
                 System.out.print(result);
@@ -78,13 +80,20 @@ public class Repl implements NotificationHandler {
         }
 
         if (result.contains("You successfully joined the game as team: WHITE") ||
-            result.contains("You successfully joined the game as team: BLACK") ||
-            result.contains("You are now spectating the game")) {
+            result.contains("You successfully joined the game as team: BLACK")) {
 
             username = preClient.getUsername();
             teamColor = postClient.getTeamColor();
             gameID = postClient.getGameId();
             replState = ReplState.INGAME;
+        }
+
+        if (result.contains("You are now spectating the game")) {
+            username = preClient.getUsername();
+            teamColor = postClient.getTeamColor();
+            gameID = postClient.getGameId();
+            replState = ReplState.INGAME;
+            spect = true;
         }
 
 
@@ -94,10 +103,9 @@ public class Repl implements NotificationHandler {
                     EscapeSequences.SET_TEXT_COLOR_WHITE);
             System.out.print(preClient.help());
         }
-        if (result.contains("You left the game.") && replState == ReplState.INGAME) {
+        if ((result.contains("You left the game.") && replState == ReplState.INGAME) ||
+                (result.contains("You resigned from the game.") && replState == ReplState.INGAME)) {
             replState = ReplState.POSTLOGIN;
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + "You successfully left the game." +
-                    EscapeSequences.SET_TEXT_COLOR_WHITE);
             System.out.print(postClient.help());
         }
     }
@@ -123,6 +131,7 @@ public class Repl implements NotificationHandler {
                 ChessGame chessGame = loadGameMessage.getGame();
 
                 if (chessGame != null && chessGame.getBoard() != null) {
+                    this.game = chessGame;
                     this.board = chessGame.getBoard();
                     this.isWhite = teamColor == null || teamColor.equalsIgnoreCase("WHITE");
 
