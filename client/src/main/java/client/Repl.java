@@ -110,10 +110,14 @@ public class Repl implements NotificationHandler {
     public void notify(ServerMessage message) {
         try {
             if (message instanceof ErrorMessage) {
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + message);
+                ErrorMessage error = (ErrorMessage) message;
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED +
+                        error.getErrorMessage() + EscapeSequences.RESET_TEXT_COLOR);
             }
             if (message instanceof NotificationMessage) {
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + message);
+                NotificationMessage note = (NotificationMessage) message;
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_MAGENTA +
+                        note.getMessage() + EscapeSequences.RESET_TEXT_COLOR);
             }
             if (message instanceof LoadGameMessage loadGameMessage) {
                 ChessGame chessGame = loadGameMessage.getGame();
