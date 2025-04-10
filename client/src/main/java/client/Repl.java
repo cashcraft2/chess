@@ -15,7 +15,7 @@ import websocket.NotificationHandler;
 
 public class Repl implements NotificationHandler {
     private final PreloginClient preClient;
-    private final PostloginClient postClient;
+    private PostloginClient postClient = null;
     private InGameClient gameClient;
     private ReplState replState;
     private String authToken = null;
@@ -28,9 +28,9 @@ public class Repl implements NotificationHandler {
 
     public Repl(String serverUrl) {
         preClient = new PreloginClient(serverUrl);
-        postClient = new PostloginClient(serverUrl);
         try{
             this.ws = new WebSocketFacade(serverUrl, this);
+            postClient = new PostloginClient(serverUrl, ws, this);
             gameClient = new InGameClient(serverUrl, ws, this);
         } catch (ResponseException ex) {
             System.out.println("Error: " + ex.getMessage());
@@ -55,7 +55,7 @@ public class Repl implements NotificationHandler {
             try {
                 switch (replState) {
                     case PRELOGIN -> result = preClient.eval(line);
-                    case POSTLOGIN -> result = postClient.eval(line, authToken);
+                    case POSTLOGIN -> result = postClient.eval(line, username, authToken);
                     case INGAME -> result = gameClient.eval(line, authToken, username,
                                     teamColor, gameID, board, isWhite);
                 }
@@ -85,8 +85,6 @@ public class Repl implements NotificationHandler {
             teamColor = postClient.getTeamColor();
             gameID = postClient.getGameId();
             replState = ReplState.INGAME;
-
-            System.out.println("Waiting for board state from server...");
         }
 
 
@@ -118,7 +116,6 @@ public class Repl implements NotificationHandler {
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + message);
             }
             if (message instanceof LoadGameMessage loadGameMessage) {
-                System.out.println("Received LoadGameMessage, rendering board...");
                 ChessGame chessGame = loadGameMessage.getGame();
 
                 if (chessGame != null && chessGame.getBoard() != null) {
@@ -126,7 +123,6 @@ public class Repl implements NotificationHandler {
                     this.isWhite = teamColor == null || teamColor.equalsIgnoreCase("WHITE");
 
                     if(replState == ReplState.INGAME) {
-                        System.out.println("Waiting for board state from server...");
                         ChessBoardRenderer.setBoard(board, isWhite);
                     }
                 }

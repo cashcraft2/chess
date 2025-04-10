@@ -29,13 +29,6 @@ public class InGameClient {
 
     public String eval(String input, String authToken, String username, String teamColor,
                        Integer gameID, ChessBoard board, boolean isWhite) {
-
-        try{
-            ws.connectToGame(authToken, gameID, username, teamColor);
-        } catch (Exception ex) {
-            System.out.println("Error: " + ex.getMessage());
-        }
-
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";

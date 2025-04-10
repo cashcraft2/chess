@@ -5,6 +5,9 @@ import exception.ResponseException;
 import model.GameData;
 import server.ServerFacade;
 import ui.EscapeSequences;
+import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,14 +16,19 @@ import java.util.Map;
 public class PostloginClient {
     private final ServerFacade server;
     private final Map<Integer, Integer> gameIdMap = new HashMap<>();
+    private final WebSocketFacade ws;
+    private final NotificationHandler notificationHandler;
     private String teamColor;
     private int gameID;
 
-    public PostloginClient(String serverUrl) {
+    public PostloginClient(String serverUrl, WebSocketFacade ws, NotificationHandler notificationHandler) {
         server = new ServerFacade(serverUrl);
+        this.notificationHandler = notificationHandler;
+        this.ws = ws;
     }
 
-    public String eval(String input, String authToken) {
+    public String eval(String input, String username, String authToken) {
+
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
@@ -30,7 +38,7 @@ public class PostloginClient {
                 case "logout" -> logout(authToken);
                 case "list" -> listGames(authToken);
                 case "create" -> createGame(authToken, params);
-                case "join" -> joinGame(authToken, params);
+                case "join" -> joinGame(authToken, username, params);
                 case "spectate" -> spectateGame( authToken, params);
                 case "quit" -> "quit";
                 default -> help();
@@ -53,7 +61,7 @@ public class PostloginClient {
                 """ + EscapeSequences.RESET_TEXT_ITALIC;
     }
 
-    private String joinGame(String authToken, String... params) throws ResponseException {
+    private String joinGame(String authToken, String username, String... params) throws ResponseException {
         if (params.length >= 2) {
             String teamColor = params[0].toUpperCase();
             this.teamColor = teamColor;
@@ -113,6 +121,13 @@ public class PostloginClient {
             }
 
             server.joinGame(teamColor, actualGameId, authToken);
+
+            try{
+                ws.connectToGame(authToken, gameID, username, teamColor);
+            } catch (Exception ex) {
+                System.out.println("Error: " + ex.getMessage());
+            }
+
             return String.format(EscapeSequences.SET_TEXT_COLOR_BLUE + "You successfully joined the game as team: %s" +
                     EscapeSequences.SET_TEXT_COLOR_WHITE, teamColor);
         }

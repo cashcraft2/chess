@@ -93,7 +93,7 @@ public class WebSocketFacade extends Endpoint {
             var command = new MakeMoveCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID,
                     null, teamColor);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
-            this.session.close();
+            //lthis.session.close();
         }
         catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
