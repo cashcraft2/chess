@@ -164,6 +164,7 @@ public class InGameClient {
         }
     }
 
+
     private String highlightLegalMoves(ChessGame game, boolean isWhite, String... params) {
         try {
             if (params.length < 1) {
