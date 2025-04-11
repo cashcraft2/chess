@@ -63,7 +63,7 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void connectToGame(String authToken, Integer gameID, String username, String teamColor)
+    public void connectToGame(String authToken, Integer gameID, String teamColor)
             throws ResponseException {
         try {
             var command = new MakeMoveCommand
@@ -75,7 +75,7 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void makeMove(String authToken, Integer gameID, ChessMove move, String username, String teamColor)
+    public void makeMove(String authToken, Integer gameID, ChessMove move, String teamColor)
             throws ResponseException {
         try {
             var command = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID,
@@ -87,26 +87,24 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void leaveGame(String authToken, Integer gameID, String username, String teamColor)
+    public void leaveGame(String authToken, Integer gameID, String teamColor)
             throws ResponseException {
         try {
             var command = new MakeMoveCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID,
                     null, teamColor);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
-            //lthis.session.close();
         }
         catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
     }
 
-    public void resignGame(String authToken, Integer gameID, String username, String teamColor)
+    public void resignGame(String authToken, Integer gameID, String teamColor)
             throws ResponseException {
         try {
             var command = new MakeMoveCommand
                     (UserGameCommand.CommandType.RESIGN, authToken, gameID, null, teamColor);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
-            //this.session.close();
         }
         catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());

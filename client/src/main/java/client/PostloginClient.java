@@ -38,8 +38,8 @@ public class PostloginClient {
                 case "logout" -> logout(authToken);
                 case "list" -> listGames(authToken);
                 case "create" -> createGame(authToken, params);
-                case "join" -> joinGame(authToken, username, game, params);
-                case "spectate" -> spectateGame( authToken, username, game, params);
+                case "join" -> joinGame(authToken, params);
+                case "spectate" -> spectateGame(authToken, params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -61,7 +61,7 @@ public class PostloginClient {
                 """ + EscapeSequences.RESET_TEXT_ITALIC;
     }
 
-    private String joinGame(String authToken, String username, ChessGame chessGame, String... params)
+    private String joinGame(String authToken, String... params)
             throws ResponseException {
         if (params.length >= 2) {
             String teamColor = params[0].toUpperCase();
@@ -124,7 +124,7 @@ public class PostloginClient {
             server.joinGame(teamColor, actualGameId, authToken);
 
             try{
-                ws.connectToGame(authToken, gameID, username, teamColor);
+                ws.connectToGame(authToken, gameID, teamColor);
             } catch (Exception ex) {
                 System.out.println("Error: " + ex.getMessage());
             }
@@ -137,7 +137,7 @@ public class PostloginClient {
                 EscapeSequences.SET_TEXT_COLOR_WHITE;
     }
 
-    private String spectateGame(String authToken, String username, ChessGame chessGame, String...params) throws ResponseException {
+    private String spectateGame(String authToken, String...params) throws ResponseException {
         if (params.length < 1) {
             return EscapeSequences.SET_TEXT_COLOR_RED +
                     "Error: Invalid input. Expected: <game ID>" +
@@ -172,7 +172,7 @@ public class PostloginClient {
                 .orElse(null);
 
         try{
-            ws.connectToGame(authToken, gameID, username, teamColor);
+            ws.connectToGame(authToken, gameID, teamColor);
         } catch (Exception ex) {
             System.out.println("Error: " + ex.getMessage());
         }

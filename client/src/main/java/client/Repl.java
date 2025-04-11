@@ -64,7 +64,8 @@ public class Repl implements NotificationHandler {
                 transitionRepl(result);
                 System.out.print(result);
             } catch (Exception ex) {
-                System.out.print(EscapeSequences.SET_TEXT_COLOR_RED + ex.getMessage() + EscapeSequences.SET_TEXT_COLOR_WHITE);
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_RED + ex.getMessage() +
+                        EscapeSequences.SET_TEXT_COLOR_WHITE);
             }
         }
         System.out.println();

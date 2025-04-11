@@ -25,10 +25,6 @@ public class ChessGame {
         return gameOver;
     }
 
-    public void setGameOver(boolean isOver) {
-        this.gameOver = isOver;
-    }
-
     public void resign() {
         this.gameOver = true;
     }

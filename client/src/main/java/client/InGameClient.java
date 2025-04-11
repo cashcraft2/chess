@@ -21,10 +21,10 @@ public class InGameClient {
     private final String serverUrl;
     private final NotificationHandler notificationHandler;
     private final WebSocketFacade ws;
-    private ChessBoard board;
-    private boolean isWhite;
 
-    public InGameClient(String serverUrl, WebSocketFacade ws, NotificationHandler notificationHandler) throws ResponseException {
+
+    public InGameClient(String serverUrl, WebSocketFacade ws, NotificationHandler notificationHandler)
+            throws ResponseException {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         this.notificationHandler = notificationHandler;
@@ -40,11 +40,11 @@ public class InGameClient {
 
             return switch (cmd) {
                 case "quit" -> quitAll();
-                case "redraw" -> redrawBoard(authToken, username, teamColor, board, isWhite, params);
-                case "leave" -> leaveGame(authToken, username, teamColor, gameID, params);
-                case "move" -> makeMove(authToken, username, teamColor, gameID, params);
-                case "resign" -> resign(authToken, username, teamColor, gameID, spect, params);
-                case "highlight" -> highlightLegalMoves(authToken, username, teamColor, game, board, isWhite, params);
+                case "redraw" -> redrawBoard(board, isWhite);
+                case "leave" -> leaveGame(authToken, teamColor, gameID);
+                case "move" -> makeMove(authToken, teamColor, gameID, params);
+                case "resign" -> resign(authToken, teamColor, gameID, spect);
+                case "highlight" -> highlightLegalMoves(game, isWhite, params);
                 default -> help();
             };
         } catch (Exception ex) {
@@ -65,8 +65,7 @@ public class InGameClient {
         }
     }
 
-    private String redrawBoard(String authToken, String username, String teamColor,
-                               ChessBoard board, boolean isWhite, String... params) {
+    private String redrawBoard(ChessBoard board, boolean isWhite) {
         try {
             ChessBoardRenderer.setBoard(board, isWhite);
             return "";
@@ -77,9 +76,9 @@ public class InGameClient {
         }
     }
 
-    private String leaveGame(String authToken, String username, String teamColor, Integer gameID, String... params) {
+    private String leaveGame(String authToken, String teamColor, Integer gameID) {
         try {
-            ws.leaveGame(authToken, gameID, username, teamColor);
+            ws.leaveGame(authToken, gameID, teamColor);
             return EscapeSequences.SET_TEXT_COLOR_BLUE +
                     "You left the game." +
                     EscapeSequences.SET_TEXT_COLOR_WHITE;
@@ -90,7 +89,7 @@ public class InGameClient {
         }
     }
 
-    private String makeMove(String authToken, String username, String teamColor, Integer gameID, String...params) {
+    private String makeMove(String authToken, String teamColor, Integer gameID, String...params) {
         try {
             if (params.length < 2) {
                 return EscapeSequences.SET_TEXT_COLOR_RED +
@@ -101,7 +100,7 @@ public class InGameClient {
             ChessPosition end = createPosition(params[1]);
 
             ChessMove move = new ChessMove(start, end, null);
-            ws.makeMove(authToken, gameID, move, username, teamColor);
+            ws.makeMove(authToken, gameID, move, teamColor);
             return EscapeSequences.SET_TEXT_COLOR_BLUE +
                     "Move sent!" +
                     EscapeSequences.SET_TEXT_COLOR_WHITE;
@@ -112,15 +111,14 @@ public class InGameClient {
         }
     }
 
-    private String resign(String authToken, String username,
-                          String teamColor, Integer gameID, boolean spect, String...params) {
+    private String resign(String authToken, String teamColor, Integer gameID, boolean spect) {
         if (spect){
             return EscapeSequences.SET_TEXT_COLOR_RED +
                     "Error: Spectators cannot resign from a game." +
                     EscapeSequences.SET_TEXT_COLOR_WHITE;
         }
         try {
-            ws.resignGame(authToken, gameID, username, teamColor);
+            ws.resignGame(authToken, gameID, teamColor);
             return EscapeSequences.SET_TEXT_COLOR_BLUE +
                     "You resigned from the game." +
                     EscapeSequences.SET_TEXT_COLOR_WHITE;
@@ -131,8 +129,7 @@ public class InGameClient {
         }
     }
 
-    private String highlightLegalMoves(String authToken, String username, String teamColor, ChessGame game,
-                                       ChessBoard board, boolean isWhite, String... params) {
+    private String highlightLegalMoves(ChessGame game, boolean isWhite, String... params) {
         try {
             if (params.length < 1) {
                 return EscapeSequences.SET_TEXT_COLOR_RED +
@@ -178,10 +175,6 @@ public class InGameClient {
         }
 
         return new ChessPosition(row, col);
-    }
-
-    public void updateBoard(ChessBoard board) {
-        this.board = board;
     }
 
 
