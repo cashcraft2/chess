@@ -162,7 +162,9 @@ public class InGameClient {
     }
 
     private ChessPosition createPosition(String pos) throws IllegalArgumentException {
-        if (pos.length() != 2) throw new IllegalArgumentException("Invalid position: " + pos);
+        if (pos.length() != 2) {
+            throw new IllegalArgumentException("Invalid position: " + pos);
+        }
 
         char colChar = pos.charAt(0);
         char rowChar = pos.charAt(1);
