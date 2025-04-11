@@ -1,9 +1,6 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 import exception.ResponseException;
 import server.ServerFacade;
 import ui.ChessBoardRenderer;
@@ -13,6 +10,7 @@ import websocket.WebSocketFacade;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,7 +40,7 @@ public class InGameClient {
                 case "quit" -> quitAll();
                 case "redraw" -> redrawBoard(board, isWhite);
                 case "leave" -> leaveGame(authToken, teamColor, gameID);
-                case "move" -> makeMove(authToken, teamColor, gameID, params);
+                case "move" -> makeMove(authToken, teamColor, gameID, game, params);
                 case "resign" -> resign(authToken, teamColor, gameID, spect);
                 case "highlight" -> highlightLegalMoves(game, isWhite, params);
                 default -> help();
@@ -89,7 +87,7 @@ public class InGameClient {
         }
     }
 
-    private String makeMove(String authToken, String teamColor, Integer gameID, String...params) {
+    private String makeMove(String authToken, String teamColor, Integer gameID, ChessGame game, String...params) {
         try {
             if (params.length < 2) {
                 return EscapeSequences.SET_TEXT_COLOR_RED +
@@ -99,7 +97,17 @@ public class InGameClient {
             ChessPosition start = createPosition(params[0]);
             ChessPosition end = createPosition(params[1]);
 
-            ChessMove move = new ChessMove(start, end, null);
+            ChessPiece pieceToMove = game.getBoard().getPiece(start);
+            ChessPiece.PieceType promotion = null;
+
+            if (pieceToMove != null && pieceToMove.getPieceType() == ChessPiece.PieceType.PAWN) {
+                int promotionRow = (pieceToMove.getTeamColor() == ChessGame.TeamColor.WHITE) ? 8 : 1;
+                if (end.getRow() == promotionRow) {
+                    promotion = promptForPromotionPiece();
+                }
+            }
+
+            ChessMove move = new ChessMove(start, end, promotion);
             ws.makeMove(authToken, gameID, move, teamColor);
             return EscapeSequences.SET_TEXT_COLOR_BLUE +
                     "Move sent!" +
@@ -111,12 +119,39 @@ public class InGameClient {
         }
     }
 
+    private ChessPiece.PieceType promptForPromotionPiece() {
+        System.out.println("Promotion! Select your desired piece (Q, R, B, N):");
+        Scanner scanner = new Scanner(System.in);
+        String choice = scanner.nextLine().trim().toUpperCase();
+
+        switch (choice) {
+            case "Q": return ChessPiece.PieceType.QUEEN;
+            case "R": return ChessPiece.PieceType.ROOK;
+            case "B": return ChessPiece.PieceType.BISHOP;
+            case "N": return ChessPiece.PieceType.KNIGHT;
+            default:
+                System.out.println("Invalid choice, defaulting to Queen.");
+                return ChessPiece.PieceType.QUEEN;
+        }
+    }
+
     private String resign(String authToken, String teamColor, Integer gameID, boolean spect) {
         if (spect){
             return EscapeSequences.SET_TEXT_COLOR_RED +
                     "Error: Spectators cannot resign from a game." +
                     EscapeSequences.SET_TEXT_COLOR_WHITE;
         }
+
+        System.out.println("Are you sure you want to resign? (yes/no): ");
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.nextLine().trim().toLowerCase();
+
+        if (!input.equals("yes")) {
+            return EscapeSequences.SET_TEXT_COLOR_YELLOW +
+                    "Resignation cancelled." +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE;
+        }
+
         try {
             ws.resignGame(authToken, gameID, teamColor);
             return EscapeSequences.SET_TEXT_COLOR_BLUE +

@@ -158,13 +158,15 @@ public class WebSocketHandler {
         connections.broadcast(gameID, username, notification);
 
         if (chessGame.isInCheckmate(chessGame.getTeamTurn())) {
+            var message = String.format("%s is in Checkmate!", username);
             connections.broadcast(gameID, null, 
-                    new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Checkmate!"));
+                    new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
             service.updateGame(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
         }
         else if (chessGame.isInCheck(chessGame.getTeamTurn())) {
+            var message = String.format("%s is in Check!", username);
             connections.broadcast(gameID, null,
-                    new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Check!"));
+                    new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
         }
         else if (chessGame.isInStalemate(chessGame.getTeamTurn())) {
             connections.broadcast(gameID, null,
